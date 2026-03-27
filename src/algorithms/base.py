@@ -38,7 +38,7 @@ class TSPSolver(ABC):
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
     @abstractmethod
-    def setup_problem(self, tsp_file):
+    def setup_problem(self):
         """
         Sets up the TSP Problem.
 
