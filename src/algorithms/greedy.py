@@ -19,6 +19,11 @@ class Greedy(TSPSolver):
 
         Uses the greedy algorithm
 
+        1. sample initial node
+        2. while not all nodes visited
+            get closest univisited node to current node
+            add that node to the tour
+
         Parameters
         ----------
             - nodes: the coordinates of the nodes
@@ -35,7 +40,6 @@ class Greedy(TSPSolver):
         # start node random
         current_node = np.random.choice(range(size))
         tour.append(current_node)
-        nodes_remaining = size - 1
 
         visited_mask[current_node] = 1
 
