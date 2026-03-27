@@ -17,6 +17,7 @@ And are compared against the optimal solution obtained using the Concorde TSP/LH
 **Given:** A complete graph $G = (V, E)$ with $n$ cities and distance matrix $d_{ij}$
 
 **Minimize:**
+
 $$
 \min \sum_{i=1}^{n} d_{i,\sigma(i+1)}
 $$
