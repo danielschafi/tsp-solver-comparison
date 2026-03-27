@@ -156,6 +156,7 @@ experiment_runner.py          # multiprocessing.Pool — one job per (algo × se
 ```
 
 **Parallelism strategy:**
+
 - *Across runs:* `multiprocessing.Pool` or `joblib` — embarrassingly parallel, no fairness concerns.
 - *Within a run:* single-threaded for all algorithms, ensuring wall-clock time comparisons are valid.
 - *Inner loops:* Numba `@njit` applied to shared kernels only — identical speedup available to all algorithms.
@@ -176,12 +177,12 @@ A secondary analysis should examine whether the **ranking of algorithms changes 
 
 ## 8. References
 
-- Applegate, D., Bixby, R., Chvátal, V., Cook, W. — *Concorde TSP Solver*. https://www.math.uwaterloo.ca/tsp/concorde.html
-- Ben-Ameur, W. (2004). Computing the Initial Temperature of Simulated Annealing. *Computational Optimization and Applications*, 29(3), 369–383. https://doi.org/10.1023/B:COAP.0000044187.23143.bd
+- Applegate, D., Bixby, R., Chvátal, V., Cook, W. — *Concorde TSP Solver*. <https://www.math.uwaterloo.ca/tsp/concorde.html>
+- Ben-Ameur, W. (2004). Computing the Initial Temperature of Simulated Annealing. *Computational Optimization and Applications*, 29(3), 369–383. <https://doi.org/10.1023/B:COAP.0000044187.23143.bd>
 - Davis, L. (1985). Applying Adaptive Algorithms to Epistatic Domains. *IJCAI*.
-- Glover, F. (1989). Tabu Search — Part I. *ORSA Journal on Computing*, 1(3), 190–206. https://doi.org/10.1287/ijoc.1.3.190
+- Glover, F. (1989). Tabu Search — Part I. *ORSA Journal on Computing*, 1(3), 190–206. <https://doi.org/10.1287/ijoc.1.3.190>
 - Goldberg, D. E., & Lingle, R. (1985). Alleles, loci and the TSP. *ICGA*.
-- Helsgott, K. (2017). *LKH-3*. http://webhotel4.ruc.dk/~keld/research/LKH-3/
-- Kirkpatrick, S., Gelatt, C. D., & Vecchi, M. P. (1983). Optimization by Simulated Annealing. *Science*, 220(4598), 671–680. https://doi.org/10.1126/science.220.4598.671
-- Lin, S. (1965). Computer solutions of the traveling salesman problem. *Bell System Technical Journal*, 44(10), 2245–2269. https://doi.org/10.1002/j.1538-7305.1965.tb04146.x
-- Lourenço, H. R., Martin, O. C., & Stützle, T. (2003). Iterated Local Search. In *Handbook of Metaheuristics*. https://doi.org/10.1007/0-306-48056-5_11
+- Helsgott, K. (2017). *LKH-3*. <http://webhotel4.ruc.dk/~keld/research/LKH-3/>
+- Kirkpatrick, S., Gelatt, C. D., & Vecchi, M. P. (1983). Optimization by Simulated Annealing. *Science*, 220(4598), 671–680. <https://doi.org/10.1126/science.220.4598.671>
+- Lin, S. (1965). Computer solutions of the traveling salesman problem. *Bell System Technical Journal*, 44(10), 2245–2269. <https://doi.org/10.1002/j.1538-7305.1965.tb04146.x>
+- Lourenço, H. R., Martin, O. C., & Stützle, T. (2003). Iterated Local Search. In *Handbook of Metaheuristics*. <https://doi.org/10.1007/0-306-48056-5_11>

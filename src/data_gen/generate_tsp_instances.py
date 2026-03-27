@@ -1,4 +1,5 @@
 import argparse
+import shutil
 from pathlib import Path
 
 import numpy as np
@@ -6,7 +7,6 @@ import numpy as np
 DATA_DIR = Path("data")
 
 np.random.seed(42)
-import shutil
 
 
 def gen_uniform(
