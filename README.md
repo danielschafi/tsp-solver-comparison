@@ -72,3 +72,11 @@ This will generate uniform and clustered samples of sizes 10-500.
 ```bash
 echo to be done 
 ```
+
+
+## Running one algorithm
+```bash
+uv run -m src.algorithms.greedy --path <path to data dir> --problem_id <id of the problem>
+```
+- path: E.g to data/uniform/100
+- problem_id (optional): If provided, runs the algorithm only for that instance, otherwise on all instances in the folder
