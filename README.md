@@ -88,3 +88,8 @@ uv run -m src.utils.plot_one_problem --problem <path> --algorithm <algorithm tha
 - problem: Multiple possible: path from the results.json / absolute or relative path to either the _edges.npy or _nodes.npy file. Easiest to just copy the whole path
 - the solution of which algorithm to plot. must match what is saved in the results.json. One of [Greedy, ...]
 - save: if provided saves the plot
+
+
+
+## References
+- [Local Search and Metaheuristics for the Traveling Salesman Problem](https://leeds-faculty.colorado.edu/glover/Publications/TSP.pdf): Overview over some solution methods, not that mathematical 
