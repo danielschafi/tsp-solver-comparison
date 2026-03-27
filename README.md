@@ -2,13 +2,38 @@
 
 ## Introduction
 
-## The Algorithms
+The traveling salesman problem (TSP) is a classic combinatorial optimization problem that asks for the shortest possible route that visits a set of cities and returns to the origin city. This repository contains implementations of various algorithms to solve the TSP. The goal is to compare the algorithms based on their scalability and solution quality. The algorithms implemented include:
+
+- Simulated Annealing
+- Taboo Search
+- Genetic Algorithm
+- 2-opt
+- Iterated Local Search
+
+And are compared against the optimal solution obtained using the Concorde TSP/LHK3 Solver.
+
+## Traveling Salesman Problem
+
+**Given:** A complete graph $G = (V, E)$ with $n$ cities and distance matrix $d_{ij}$
+
+**Minimize:**
+$$
+\min \sum_{i=1}^{n} d_{i,\sigma(i+1)}
+$$
+
+where $\sigma$ is a permutation of cities.
+
+**Subject to:**
+
+- Each city is visited **exactly once**
+- The route forms a **single closed tour**
+- $\sigma(n+1) = \sigma(1)$ (return to start)
 
 ## Installation
 
 ### Using `uv` (Python package manager)
 
-1. Install `uv` (Python package manager):
+1. Install `uv`:
 
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
