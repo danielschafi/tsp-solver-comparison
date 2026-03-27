@@ -92,7 +92,7 @@ class TSPSolver(ABC):
         self,
         directory: str,
         problem_id: int,
-        plot: bool = True,
+        plot: bool = False,
     ):
         """
         Runs the solver from start to finish on a problem instance.
