@@ -106,7 +106,7 @@ def main():
 
     for size in args.sizes:
         gen_uniform(size, args.repetitions, data_base_dir, args.clean)
-        # gen_clustered(size, args.repetitions, data_base_dir, args.clean)
+        gen_clustered(size, args.repetitions, data_base_dir, args.clean)
 
 
 if __name__ == "__main__":

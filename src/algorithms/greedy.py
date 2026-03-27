@@ -32,24 +32,24 @@ class Greedy(TSPSolver):
         ----------
             - List[int]: The tour that was found, include the return to the first node in your solution
         """
-        tour = []
-        size = self.result["problem_size"]
+        size = nodes.shape[0]
 
         visited_mask = np.zeros(size)  # mask out the already visited nodes
 
         # start node random
-        current_node = np.random.choice(range(size))
-        tour.append(current_node)
+
+        rng = np.random.default_rng()
+        current_node = rng.integers(low=0, high=size)
+        tour = [int(current_node)]
 
         visited_mask[current_node] = 1
-
         while len(tour) < size:
             current_node = tour[-1]
             # unvisited indices
             unvisited_indices = np.where(visited_mask == 0)[0]
 
             # filter edges of current node to include only the unvisited ones
-            filtered_edges = self.edges[current_node][unvisited_indices]
+            filtered_edges = edges[current_node][unvisited_indices]
 
             # index of the minimum edge
             min_filtered_idx = np.argmin(filtered_edges)
@@ -57,8 +57,10 @@ class Greedy(TSPSolver):
             # get which edge this corresponds to in the original list
             next_node = unvisited_indices[min_filtered_idx]
 
-            tour.append(next_node)
+            tour.append(int(next_node))
+            visited_mask[next_node] = 1
 
+        tour.append(tour[0])  # loop around to start
         return tour
 
 
@@ -70,22 +72,31 @@ def main():
         "--path",
         type=str,
         required=True,
-        help="Path to the .tsp file to solve.",
+        help="Path to the directory containing the tsp files.",
+    )
+
+    arg_parser.add_argument(
+        "--problem_id",
+        type=str,
+        required=False,
+        default=None,
+        help="index of the problem to solve. So if --path data/uniform/10 is passed, then you can set the problem-id 1 to solve the problem with the id 1. where the problem consists of the two files [id]_edges.npy and [id]_nodes.npy",
     )
 
     args = arg_parser.parse_args()
     path = Path(args.path)
 
     # check if it is a file or a folder
-    if path.is_file():
+    if path.is_dir() and args.problem_id is not None:
         solver = Greedy()
-        solver.run(str(path))
+        solver.run(str(path), args.problem_id)
     elif path.is_dir():
         files = sorted(path.rglob("*.npy"))
         solver = Greedy()
         for i, tsp_file in enumerate(files):
+            problem_id = tsp_file.stem.split("_")[0]
             print(f"Solving {tsp_file} ({i + 1}/{len(files)})")
-            solver.run(str(tsp_file))
+            solver.run(str(path), problem_id)
 
 
 if __name__ == "__main__":

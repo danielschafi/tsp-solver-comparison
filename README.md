@@ -66,4 +66,9 @@ pandas
 ```bash
 uv run src/data_gen/generate_tsp_instances.py
 ```
-This will generate uniform and clustered samples of sizes 10-500
+This will generate uniform and clustered samples of sizes 10-500.
+
+2. Run the benchmark
+```bash
+echo to be done 
+```

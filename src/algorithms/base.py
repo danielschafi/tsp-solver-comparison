@@ -1,11 +1,12 @@
 import json
+import time
 from abc import ABC, abstractmethod
+from datetime import datetime
 from pathlib import Path
 from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
 np.random.seed(42)
 
@@ -22,7 +23,7 @@ class TSPSolver(ABC):
         self.time_limit = time_limit
         self.result: dict = {
             "timestamp": None,
-            "problem_file": "",
+            "problem": "",
             "problem_type": "",
             "problem_size": 0,
             "algorithm": algorithm,
@@ -37,8 +38,7 @@ class TSPSolver(ABC):
         self.results_dir = Path("results")
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
-    @abstractmethod
-    def setup_problem(self):
+    def setup_problem(self, directory: str, problem_id: int):
         """
         Sets up the TSP Problem.
 
@@ -63,19 +63,35 @@ class TSPSolver(ABC):
             - List[int]: The tour that was found, include the return to the first node in your solution
         """
 
-    def load_problem(self, tsp_file: str):
+    def load_problem(self, directory: Path, problem_id: int):
         """Loads the nodes and edges from the npy file"""
-        if not Path(tsp_file).exists():
-            raise FileNotFoundError(f"tsp_file: {tsp_file} does not exist.")
+        edges_path = Path(directory) / f"{problem_id}_edges.npy"
+        nodes_path = Path(directory) / f"{problem_id}_nodes.npy"
 
-        self.tsp_file = Path(tsp_file)
-        problem = np.load(self.tsp_file)
-        self.nodes = problem[0]  # List of node coords [[x,y], [x.y], ...]
-        self.edges = problem[1]  # Adjacency matrix
+        self.result["problem"] = str(Path(directory) / str(problem_id))
+
+        if not Path(directory).exists():
+            raise FileNotFoundError(f"Directory: {directory} does not exist.")
+
+        if not edges_path.exists():
+            raise FileNotFoundError(f"edges_path: {directory} does not exist.")
+        if not nodes_path.exists():
+            raise FileNotFoundError(f"nodes_path: {directory} does not exist.")
+
+        self.tsp_file = Path(directory)
+        self.nodes = np.load(nodes_path)  # List of node coords [[x,y], [x.y], ...]
+        self.edges = np.load(edges_path)  # Adjacency matrix
+
+        self.result["problem_size"] = self.nodes.shape[0]
+
+        self.result["problem_type"] = (
+            "uniform" if "uniform" in directory else "clustered"
+        )
 
     def run(
         self,
-        tsp_file: str,
+        directory: str,
+        problem_id: int,
         plot: bool = True,
     ):
         """
@@ -86,41 +102,54 @@ class TSPSolver(ABC):
         3. print_solution
         4. plot_solution
         5. save_results
+
+        Parameters
+        ----------
+            - directory: the direcory that contains the .npy files. eg. data/uniform/10
+            - problem_id: the id of the problem file e.g. 1 -> 1_edges.npy, 1_nodes.npy belong to that problem and will be solved
         """
 
-        self.load_problem(tsp_file)
+        self.result["timestamp"] = datetime.now().isoformat()
+        self.load_problem(directory, problem_id)
 
         print("=" * 100)
         print(f"Algorithm: {self.algorithm}")
-        print(f"Problem: {self.result['problem_file']}")
+        print(f"Problem: {self.result['problem']}")
         print(f"Problem Size: {self.result['problem_size']}")
         print(f"Problem Type: {self.result['problem_type']}")
 
         print("=" * 100)
 
-        print("Setting up problem")
-        self.setup_problem(tsp_file)
+        print("1. Setting up problem")
+        self.setup_problem(directory, problem_id)
 
-        print("Start solving TSP")
-        self.solve_tsp()
+        print("2. Start solving TSP")
+        self._start_time = time.time()
+        self.result["tour"] = self.solve_tsp(self.nodes, self.edges)
+        self._end_time = time.time()
 
+        print("3. Calculating tour cost")
+        self.result["tour_cost"] = self.calculate_tour_cost()
+
+        self.result["time_to_solve"] = self._end_time - self._start_time
         if self.result["tour"]:
-            print("Printing tour")
+            print("4. Printing tour")
             self.print_tour(self.result["tour"])
         else:
-            print("No tour computed — skipping tour print")
+            print("4. No tour computed — skipping tour print")
 
-        print("Checking validity of tour")
+        print("5. Checking validity of tour")
         self.check_solution_validity(self.result["tour"])
 
-        print("Printing results")
+        print("6. Printing results")
         self.print_results()
 
-        print("Saving results")
+        print("7. Saving results")
         self.save_results()
+        print(f"   -> {self.results_dir / 'results.json'}")
 
         if plot and self.result["tour"]:
-            print("Making plot of solution")
+            print("8. Making plot of solution")
             self.plot_solution()
 
         print("Done!")
@@ -158,17 +187,17 @@ class TSPSolver(ABC):
         print("Solution is valid")
         self.result["valid_solution"] = True
 
-    def calculate_tour_cost(self, tour):
+    def calculate_tour_cost(self):
         """
         Calculate tour cost by summing up edge weights along the tour
         Assumes tour is a list of node indices: [0, 5, 2, 1]
         """
         assert self.edges is not None
         total_cost = 0
-        n = len(tour)
+        n = len(self.result["tour"])
         for k in range(n):
-            i = tour[k]
-            j = tour[(k + 1) % n]  # Connects back to start
+            i = self.result["tour"][k]
+            j = self.result["tour"][(k + 1) % n]  # Connects back to start
             total_cost += self.edges[i, j]
 
         return float(total_cost)
@@ -184,20 +213,38 @@ class TSPSolver(ABC):
 
     def print_results(self):
         """Prints the solution found by the solver on the terminal"""
+
         print("Results:\n" + json.dumps(self.result, indent=4))
 
     def save_results(self):
-        """Saves the results to a shared JSON file in the results directory, appending as a new row."""
+        """Saves the results to a shared JSON file in the results directory.
 
+        Keyed on (algorithm, problem): re-running the same instance overwrites the previous result.
+        Writes atomically via a temp file to avoid corrupting the results on error.
+        """
         results_file = self.results_dir / "results.json"
+        tmp_file = results_file.with_suffix(".tmp")
 
+        # if the problem already has an entry overwrite that one
         if results_file.exists():
-            df = pd.read_json(results_file, orient="records")
-            df = pd.concat([df, pd.DataFrame([self.result])], ignore_index=True)
+            with open(results_file) as f:
+                records = json.load(f)
+            records = [
+                r
+                for r in records
+                if not (
+                    r["algorithm"] == self.result["algorithm"]
+                    and r["problem"] == self.result["problem"]
+                )
+            ]  # read only records that are not our new one
         else:
-            df = pd.DataFrame([self.result])
+            records = []
 
-        df.to_json(results_file, orient="records", indent=2)
+        records.append(self.result)
+
+        with open(tmp_file, "w") as f:
+            json.dump(records, f, indent=2)
+        tmp_file.replace(results_file)
 
     def plot_solution(self):
         """Plots the found solution"""
@@ -216,7 +263,9 @@ class TSPSolver(ABC):
         # Plot nodes in blue
         ax.scatter(self.nodes[:, 0], self.nodes[:, 1], color="blue", s=50, zorder=5)
 
-        ax.set_title(f"{self.algorithm} - Cost: {self.result['tour_cost']:.2f}")
+        ax.set_title(
+            f"{self.algorithm} | {self.result['problem']} | Cost: {self.result['tour_cost']:.2f}"
+        )
         ax.set_xlabel("X")
         ax.set_ylabel("Y")
 
