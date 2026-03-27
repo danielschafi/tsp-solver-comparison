@@ -59,3 +59,11 @@ numpy
 matplotlib
 pandas
 ```
+
+## Running the Benchmark
+
+1. Generate tsp problems
+```bash
+uv run src/data_gen/generate_tsp_instances.py
+```
+This will generate uniform and clustered samples of sizes 10-500
