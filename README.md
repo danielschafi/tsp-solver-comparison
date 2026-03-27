@@ -80,3 +80,11 @@ uv run -m src.algorithms.greedy --path <path to data dir> --problem_id <id of th
 ```
 - path: E.g to data/uniform/100
 - problem_id (optional): If provided, runs the algorithm only for that instance, otherwise on all instances in the folder
+
+## Plotting one solution
+```bash
+uv run -m src.utils.plot_one_problem --problem <path> --algorithm <algorithm that was used> --save
+```
+- problem: Multiple possible: path from the results.json / absolute or relative path to either the _edges.npy or _nodes.npy file. Easiest to just copy the whole path
+- the solution of which algorithm to plot. must match what is saved in the results.json. One of [Greedy, ...]
+- save: if provided saves the plot
