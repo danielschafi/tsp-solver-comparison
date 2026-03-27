@@ -66,7 +66,7 @@ class Greedy(TSPSolver):
 
 def main():
     arg_parser = argparse.ArgumentParser(
-        description="run the greedy solver on a .npy file "
+        description="run the greedy solver on a .npy file or a folder containing .npy files "
     )
     arg_parser.add_argument(
         "--path",
@@ -91,7 +91,7 @@ def main():
         solver = Greedy()
         solver.run(str(path), args.problem_id)
     elif path.is_dir():
-        files = sorted(path.rglob("*.npy"))
+        files = sorted(path.glob("*.npy"))
         solver = Greedy()
         for i, tsp_file in enumerate(files):
             problem_id = tsp_file.stem.split("_")[0]
