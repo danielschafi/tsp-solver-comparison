@@ -5,7 +5,7 @@
 The traveling salesman problem (TSP) is a classic combinatorial optimization problem that asks for the shortest possible route that visits a set of cities and returns to the origin city. This repository contains implementations of various algorithms to solve the TSP. The goal is to compare the algorithms based on their scalability and solution quality. The algorithms implemented include:
 
 - Simulated Annealing
-- Taboo Search
+- Tabu Search
 - Genetic Algorithm
 - 2-opt
 - Iterated Local Search
