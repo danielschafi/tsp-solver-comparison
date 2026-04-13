@@ -72,11 +72,10 @@ class TSPSolver(ABC):
 
         if not Path(directory).exists():
             raise FileNotFoundError(f"Directory: {directory} does not exist.")
-
         if not edges_path.exists():
-            raise FileNotFoundError(f"edges_path: {directory} does not exist.")
+            raise FileNotFoundError(f"edges_path: {directory} does not exist.\nEdges path: {edges_path}")
         if not nodes_path.exists():
-            raise FileNotFoundError(f"nodes_path: {directory} does not exist.")
+            raise FileNotFoundError(f"nodes_path: {directory} does not exist.\nNode path: {nodes_path}")
 
         self.tsp_file = Path(directory)
         self.nodes = np.load(nodes_path)  # List of node coords [[x,y], [x.y], ...]
