@@ -63,33 +63,38 @@ pandas
 ## Running the Benchmark
 
 1. Generate tsp problems
+
 ```bash
 uv run src/data_gen/generate_tsp_instances.py
 ```
+
 This will generate uniform and clustered samples of sizes 10-500.
 
-2. Run the benchmark
+1. Run the benchmark
+
 ```bash
 echo to be done 
 ```
 
-
 ## Running one algorithm
+
 ```bash
 uv run -m src.algorithms.greedy --path <path to data dir> --problem_id <id of the problem>
 ```
+
 - path: E.g to data/uniform/100
 - problem_id (optional): If provided, runs the algorithm only for that instance, otherwise on all instances in the folder
 
 ## Plotting one solution
+
 ```bash
 uv run -m src.utils.plot_one_problem --problem <path> --algorithm <algorithm that was used> --save
 ```
-- problem: Multiple possible: path from the results.json / absolute or relative path to either the _edges.npy or _nodes.npy file. Easiest to just copy the whole path
+
+- problem: Multiple possible: path from the results.json / absolute or relative path to either the _edges.npy or_nodes.npy file. Easiest to just copy the whole path
 - the solution of which algorithm to plot. must match what is saved in the results.json. One of [Greedy, ...]
 - save: if provided saves the plot
 
-
-
 ## References
-- [Local Search and Metaheuristics for the Traveling Salesman Problem](https://leeds-faculty.colorado.edu/glover/Publications/TSP.pdf): Overview over some solution methods, not that mathematical 
+
+- [Local Search and Metaheuristics for the Traveling Salesman Problem](https://leeds-faculty.colorado.edu/glover/Publications/TSP.pdf): Overview over some solution methods, not that mathematical

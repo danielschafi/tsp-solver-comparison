@@ -62,27 +62,48 @@ class SimulatedAnnealing(TSPSolver):
         current = get_greeedy_initial_solution(nodes, edges)
         best = current
 
+        print(best)
+
         for t in range(MAX_ITERATIONS):
+            print(t)
             T = self.schedule(t)
 
             # Fully cooled down return best found solution
             if T == 0:
                 return best
 
-            next = self.two_opt()
+            next = self.two_opt(current, edges)
 
-            delta = self.calculate_tour_cost(next) - self.calculate_tour_cost(current)
+            delta = self.calculate_tour_cost(
+                next + [next[0]]
+            ) - self.calculate_tour_cost(current + [current[0]])
+
+            print(delta)
 
             if delta < 0:
                 current = next
-                if self.calculate_tour_cost(current) < self.calculate_tour_cost(best):
+                if self.calculate_tour_cost(
+                    current + [current[0]]
+                ) < self.calculate_tour_cost(best + [best[0]]):
                     best = current
 
             else:
-                if np.random.bernoulli(np.exp(-delta / T)) == 1:
+                if np.random.binomial(1, np.exp(-delta / T), 1) == 1:
                     current = next
 
-    def two_opt(tour):
+        # append wrapparound
+        return best + [best[0]]
+
+    def two_opt(self, tour, edges):
+        n = len(tour)
+
+        i = np.random.randint(n)
+        j = np.random.randint(n)
+
+        # reverse segment between i and j
+
+        tour[i : j + 1] = reversed(tour[i : j + 1])
+
         return tour
 
     def schedule(self, T: int) -> float:

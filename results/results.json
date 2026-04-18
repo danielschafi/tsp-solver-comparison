@@ -1,28 +1,5 @@
 [
   {
-    "timestamp": "2026-03-27T20:29:59.242076",
-    "problem": "data/uniform/10/0",
-    "problem_type": "uniform",
-    "problem_size": 10,
-    "algorithm": "Greedy",
-    "time_to_solve": 0.00029659271240234375,
-    "tour_cost": 3.1580595853308853,
-    "tour": [
-      4,
-      1,
-      6,
-      9,
-      8,
-      7,
-      2,
-      3,
-      5,
-      0,
-      4
-    ],
-    "valid_solution": true
-  },
-  {
     "timestamp": "2026-03-27T20:29:59.579995",
     "problem": "data/uniform/10/10",
     "problem_type": "uniform",
@@ -688,5 +665,52 @@
       3
     ],
     "valid_solution": true
+  },
+  {
+    "timestamp": "2026-04-10T15:04:02.336475",
+    "problem": "data/uniform/10/0",
+    "problem_type": "uniform",
+    "problem_size": 10,
+    "algorithm": "Greedy",
+    "time_to_solve": 0.00018334388732910156,
+    "tour_cost": 3.122388192989888,
+    "tour": [
+      1,
+      4,
+      0,
+      3,
+      5,
+      8,
+      9,
+      7,
+      2,
+      6,
+      1
+    ],
+    "valid_solution": true
+  },
+  {
+    "timestamp": "2026-04-10T15:52:57.415300",
+    "problem": "data/uniform/10/0",
+    "problem_type": "uniform",
+    "problem_size": 10,
+    "algorithm": "SimulatedAnnealing",
+    "time_to_solve": 0.1945362091064453,
+    "tour_cost": 5.67555129148794,
+    "tour": [
+      7,
+      6,
+      9,
+      5,
+      8,
+      3,
+      0,
+      2,
+      4,
+      1,
+      4,
+      7
+    ],
+    "valid_solution": false
   }
 ]

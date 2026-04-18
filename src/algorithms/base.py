@@ -187,12 +187,20 @@ class TSPSolver(ABC):
         print("Solution is valid")
         self.result["valid_solution"] = True
 
-    def calculate_tour_cost(self):
+    def calculate_tour_cost(self, tour=None):
         """
         Calculate tour cost by summing up edge weights along the tour
         Assumes tour is a list of node indices: [0, 5, 2, 1]
         """
         assert self.edges is not None
+
+        if tour is None and self.result["tour"] is None:
+            raise ValueError(
+                "Cant calculate_tour_cost, both tour parameter and self.result['tour'] are None"
+            )
+
+        if tour is None:
+            tour = self.result["tour"]
         total_cost = 0
         n = len(self.result["tour"])
         for k in range(n):
