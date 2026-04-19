@@ -11,12 +11,6 @@ from src.utils.shared_util_funcs import apply_two_opt_improvement, get_greeedy_i
 class IterativeLocalSearch(TSPSolver):
     def __init__(self, time_limit: float | None = None):
         super().__init__("IterativeLocalSearch", time_limit)
-        self._initial_tour: list = []
-
-    def setup_problem(self, directory: str, problem_id: int):
-        super().setup_problem(directory, problem_id)
-        tour = get_greeedy_initial_solution(self.nodes, self.edges)[:-1]
-        self._initial_tour = apply_two_opt_improvement(tour, self.edges)
 
     def solve_tsp(self, nodes: np.ndarray, edges: np.ndarray) -> List[int]:
         """
@@ -66,7 +60,8 @@ class IterativeLocalSearch(TSPSolver):
         """
         MAX_ITERATIONS = 200
 
-        current = self._initial_tour[:]
+        tour = get_greeedy_initial_solution(nodes, edges)[:-1]
+        current = apply_two_opt_improvement(tour, edges)
         best = current[:]
 
         for _ in range(MAX_ITERATIONS):

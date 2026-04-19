@@ -11,13 +11,10 @@ class SimulatedAnnealing(TSPSolver):
     def __init__(self, time_limit: float | None = None):
         super().__init__("SimulatedAnnealing", time_limit)
         self.T_0: float = 0.1
-        self._initial_tour: list = []
-
     def setup_problem(self, directory: str, problem_id: int):
         super().setup_problem(directory, problem_id)
-        tour = get_greeedy_initial_solution(self.nodes, self.edges)[:-1]
-        self._initial_tour = tour
-        self.T_0 = self._estimate_initial_temperature(tour)
+        random_tour = list(np.random.permutation(len(self.nodes)))
+        self.T_0 = self._estimate_initial_temperature(random_tour)
 
     def solve_tsp(self, nodes: np.ndarray, edges: np.ndarray) -> List[int]:
         """
@@ -63,7 +60,7 @@ class SimulatedAnnealing(TSPSolver):
         """
         MAX_ITERATIONS = 100000
 
-        current = self._initial_tour[:]
+        current = get_greeedy_initial_solution(nodes, edges)[:-1]
         best = current[:]
 
         for t in range(MAX_ITERATIONS):
