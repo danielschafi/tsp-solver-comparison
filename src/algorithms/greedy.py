@@ -6,9 +6,6 @@ import numpy as np
 
 from src.algorithms.base import TSPSolver
 
-np.random.seed(42)
-
-
 class Greedy(TSPSolver):
     def __init__(self, time_limit: float | None = None):
         super().__init__("Greedy", time_limit)
@@ -38,7 +35,7 @@ class Greedy(TSPSolver):
 
         # start node random
 
-        rng = np.random.default_rng()
+        rng = np.random.default_rng(42)
         current_node = rng.integers(low=0, high=size)
         tour = [int(current_node)]
 

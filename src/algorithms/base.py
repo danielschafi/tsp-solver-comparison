@@ -8,9 +8,6 @@ from typing import List
 import matplotlib.pyplot as plt
 import numpy as np
 
-np.random.seed(42)
-
-
 class TSPSolver(ABC):
     """
     Base Class for TSP Solvers
@@ -45,7 +42,7 @@ class TSPSolver(ABC):
             - Use this if you need to process the data in some way, or do something else
             that is not directly related to running the algorithm
         """
-        return
+        np.random.seed(42)
 
     @abstractmethod
     def solve_tsp(self, nodes: np.ndarray, edges: np.ndarray) -> List[int]:

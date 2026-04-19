@@ -7,12 +7,17 @@ import numpy as np
 from src.algorithms.base import TSPSolver
 from src.utils.shared_util_funcs import get_greeedy_initial_solution, two_opt_move
 
-np.random.seed(42)
-
-
 class SimulatedAnnealing(TSPSolver):
     def __init__(self, time_limit: float | None = None):
         super().__init__("SimulatedAnnealing", time_limit)
+        self.T_0: float = 0.1
+        self._initial_tour: list = []
+
+    def setup_problem(self, directory: str, problem_id: int):
+        super().setup_problem(directory, problem_id)
+        tour = get_greeedy_initial_solution(self.nodes, self.edges)[:-1]
+        self._initial_tour = tour
+        self.T_0 = self._estimate_initial_temperature(tour)
 
     def solve_tsp(self, nodes: np.ndarray, edges: np.ndarray) -> List[int]:
         """
@@ -56,10 +61,9 @@ class SimulatedAnnealing(TSPSolver):
         ----------
             - List[int]: The tour that was found, include the return to the first node in your solution
         """
-        MAX_ITERATIONS = 10000
+        MAX_ITERATIONS = 100000
 
-        # Greedy returns a closed tour; strip the closing node — SA works with open tours
-        current = get_greeedy_initial_solution(nodes, edges)[:-1]
+        current = self._initial_tour[:]
         best = current[:]
 
         for t in range(MAX_ITERATIONS):
@@ -85,9 +89,22 @@ class SimulatedAnnealing(TSPSolver):
 
         return best + [best[0]]
 
-    def schedule(self, T: int) -> float:
-        """Returns the temperature at time t. according to geometric schedule"""
-        return 0.99**T
+    def _estimate_initial_temperature(
+        self, tour: List[int], n_samples: int = 200, target_acceptance: float = 0.6
+    ) -> float:
+        """Sample random 2-opt deltas to set T_0 so ~60% of bad moves are accepted initially."""
+        deltas = []
+        for _ in range(n_samples):
+            neighbor = two_opt_move(tour)
+            delta = self.calculate_tour_cost(neighbor) - self.calculate_tour_cost(tour)
+            if delta > 0:
+                deltas.append(delta)
+        mean_delta = np.mean(deltas) if deltas else 0.1
+        return mean_delta / np.log(1 / target_acceptance)
+
+    def schedule(self, t: int) -> float:
+        """Geometric cooling: T_0 * 0.9999^t, calibrated to the problem scale."""
+        return self.T_0 * (0.9999**t)
 
 
 def main():
