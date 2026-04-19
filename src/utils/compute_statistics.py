@@ -70,6 +70,12 @@ def compute_stats(records: list[dict]) -> list[dict]:
 
 
 def print_table(rows: list[dict]) -> None:
+    print(format_table(rows), end="")
+
+
+def format_table(rows: list[dict]) -> str:
+    import io
+    buf = io.StringIO()
     header = (
         f"{'Algorithm':<25} {'Type':<10} {'n':>4} {'Size':>5}  "
         f"{'Mean Cost':>11} {'Std Cost':>10}  "
@@ -77,25 +83,31 @@ def print_table(rows: list[dict]) -> None:
         f"{'Mean Gap%':>10} {'Std Gap%':>9}"
     )
     sep = "-" * len(header)
-
     current_type = None
     for row in rows:
         if row["problem_type"] != current_type:
             current_type = row["problem_type"]
-            print(f"\n=== {current_type.upper()} INSTANCES ===")
-            print(header)
-            print(sep)
+            buf.write(f"\n=== {current_type.upper()} INSTANCES ===\n")
+            buf.write(header + "\n")
+            buf.write(sep + "\n")
 
         def fmt(v, w=11, d=4):
             return f"{v:{w}.{d}f}" if not np.isnan(v) else f"{'N/A':>{w}}"
 
-        print(
+        buf.write(
             f"{row['algorithm']:<25} {row['problem_type']:<10} "
             f"{row['n_valid']:>4} {row['problem_size']:>5}  "
             f"{fmt(row['mean_cost'])} {fmt(row['std_cost'])}  "
             f"{fmt(row['mean_time_s'], 12, 6)} {fmt(row['std_time_s'], 11, 6)}  "
-            f"{fmt(row['mean_gap_pct'], 10, 2)} {fmt(row['std_gap_pct'], 9, 2)}"
+            f"{fmt(row['mean_gap_pct'], 10, 2)} {fmt(row['std_gap_pct'], 9, 2)}\n"
         )
+    return buf.getvalue()
+
+
+def save_txt(rows: list[dict], path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(format_table(rows))
+    print(f"Saved statistics to {path}")
 
 
 def save_csv(rows: list[dict], path: Path) -> None:
@@ -114,6 +126,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Compute aggregated benchmark statistics.")
     parser.add_argument("--results", default="results/results.json", help="Path to results JSON.")
     parser.add_argument("--csv", default=None, metavar="PATH", help="Save stats to CSV file.")
+    parser.add_argument("--txt", default=None, metavar="PATH", help="Save stats to text file.")
     args = parser.parse_args()
 
     records = load_results(Path(args.results))
@@ -122,6 +135,8 @@ def main() -> None:
 
     if args.csv:
         save_csv(rows, Path(args.csv))
+    if args.txt:
+        save_txt(rows, Path(args.txt))
 
 
 if __name__ == "__main__":

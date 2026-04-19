@@ -3,11 +3,12 @@
 Usage:
     uv run -m src.utils.create_aggregate_plots [--save] [--out results/plots]
 
-Produces four figures:
-  1. Time scaling  — mean solve time vs. problem size (log-log) per problem type
-  2. Solution quality — mean tour cost vs. problem size per problem type
-  3. Optimality gap — mean % gap above best-known per algorithm/size (bar chart)
-  4. Gap heatmap   — algorithm × size grid, color = mean gap %
+Produces five figures:
+  1. Time scaling      — mean solve time vs. problem size (log-log) per problem type
+  2. Solution quality  — mean tour cost vs. problem size per problem type
+  3. Optimality gap    — mean % gap above best-known vs. problem size (line plot)
+  4. Optimality gap    — mean % gap above best-known per algorithm/size (bar chart)
+  5. Gap heatmap       — algorithm × size grid, color = mean gap %
 """
 
 import argparse
@@ -17,7 +18,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
-from src.utils.compute_statistics import compute_stats, load_results
+from src.utils.compute_statistics import compute_stats, load_results, save_txt
 
 ALGO_ORDER = [
     "Greedy",
@@ -142,6 +143,33 @@ def fig_gap_bars(rows: list[dict], axes: list[plt.Axes], ptypes: list[str]) -> N
         ax.legend(fontsize=8)
 
 
+def fig_gap_lines(rows: list[dict], axes: list[plt.Axes], ptypes: list[str]) -> None:
+    for ax, ptype in zip(axes, ptypes):
+        subset = [r for r in rows if r["problem_type"] == ptype]
+        by_algo = _group_by(subset, ["algorithm"])
+
+        for (algo,), grp in sorted(by_algo.items()):
+            grp_sorted = sorted(grp, key=lambda r: r["problem_size"])
+            valid = [(r["problem_size"], r["mean_gap_pct"], r["std_gap_pct"])
+                     for r in grp_sorted if not np.isnan(r["mean_gap_pct"])]
+            if not valid:
+                continue
+            sizes, gaps, errs = zip(*valid)
+            ax.errorbar(
+                sizes, gaps, yerr=errs,
+                label=algo,
+                color=ALGO_COLOR.get(algo),
+                marker=ALGO_MARKER.get(algo),
+                linewidth=1.5, markersize=6, capsize=3,
+            )
+
+        ax.set_title(f"{ptype.capitalize()} instances")
+        ax.set_xlabel("Problem size (n)")
+        ax.set_ylabel("Mean gap above best known (%)")
+        ax.grid(True, linestyle="--", alpha=0.4)
+        ax.legend(fontsize=8)
+
+
 def fig_gap_heatmap(rows: list[dict], axes: list[plt.Axes], ptypes: list[str]) -> None:
     for ax, ptype in zip(axes, ptypes):
         subset = [r for r in rows if r["problem_type"] == ptype]
@@ -189,6 +217,7 @@ def main() -> None:
     out_dir = Path(args.out)
     if args.save:
         out_dir.mkdir(parents=True, exist_ok=True)
+        save_txt(rows, out_dir / "statistics.txt")
 
     def _save_or_show(fig: plt.Figure, name: str) -> None:
         fig.tight_layout()
@@ -214,17 +243,23 @@ def main() -> None:
     fig_solution_quality(rows, ax_map2.get("uniform", axes2[0, 0]), ax_map2.get("clustered", axes2[0, -1]))
     _save_or_show(fig2, "solution_quality")
 
-    # Figure 3: Optimality gap bars
-    fig3, axes3 = plt.subplots(1, len(ptypes), figsize=(7 * len(ptypes), 5), squeeze=False)
-    fig3.suptitle("Optimality Gap (% above best known)", fontsize=13, fontweight="bold")
-    fig_gap_bars(rows, list(axes3[0]), ptypes)
-    _save_or_show(fig3, "optimality_gap_bars")
+    # Figure 3: Optimality gap line plot
+    fig3, axes3 = plt.subplots(1, len(ptypes), figsize=(6 * len(ptypes), 5), squeeze=False)
+    fig3.suptitle("Optimality Gap by Problem Size", fontsize=13, fontweight="bold")
+    fig_gap_lines(rows, list(axes3[0]), ptypes)
+    _save_or_show(fig3, "optimality_gap_lines")
 
-    # Figure 4: Gap heatmap
-    fig4, axes4 = plt.subplots(1, len(ptypes), figsize=(5 * len(ptypes), 5), squeeze=False)
-    fig4.suptitle("Mean Gap Heatmap (algorithm × size)", fontsize=13, fontweight="bold")
-    fig_gap_heatmap(rows, list(axes4[0]), ptypes)
-    _save_or_show(fig4, "gap_heatmap")
+    # Figure 4: Optimality gap bars
+    fig4, axes4 = plt.subplots(1, len(ptypes), figsize=(7 * len(ptypes), 5), squeeze=False)
+    fig4.suptitle("Optimality Gap (% above best known)", fontsize=13, fontweight="bold")
+    fig_gap_bars(rows, list(axes4[0]), ptypes)
+    _save_or_show(fig4, "optimality_gap_bars")
+
+    # Figure 5: Gap heatmap
+    fig5, axes5 = plt.subplots(1, len(ptypes), figsize=(5 * len(ptypes), 5), squeeze=False)
+    fig5.suptitle("Mean Gap Heatmap (algorithm × size)", fontsize=13, fontweight="bold")
+    fig_gap_heatmap(rows, list(axes5[0]), ptypes)
+    _save_or_show(fig5, "gap_heatmap")
 
 
 if __name__ == "__main__":
