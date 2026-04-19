@@ -9,9 +9,7 @@ from src.utils.shared_util_funcs import get_greeedy_initial_solution
 
 
 POPULATION_SIZE = 100
-GENERATIONS = 500
 CROSSOVER_RATE = 0.9
-MUTATION_RATE = 0.1
 TOURNAMENT_SIZE = 5
 ELITISM_COUNT = 2
 
@@ -84,10 +82,14 @@ class Genetic(TSPSolver):
         ----------
             - List[int]: The tour found, including the return to the first node
         """
+        n = len(nodes)
+        generations = max(100, 10 * n)
+        mutation_rate = 1 / n
+
         population = self._initialize_population(nodes, edges)
         best = min(population, key=lambda t: self.calculate_tour_cost(t))
 
-        for _ in range(GENERATIONS):
+        for _ in range(generations):
             costs = [self.calculate_tour_cost(t) for t in population]
             sorted_indices = np.argsort(costs)
 
@@ -102,7 +104,7 @@ class Genetic(TSPSolver):
                 else:
                     child = parent1[:]
 
-                if np.random.random() < MUTATION_RATE:
+                if np.random.random() < mutation_rate:
                     child = self._inversion_mutate(child)
 
                 new_population.append(child)
