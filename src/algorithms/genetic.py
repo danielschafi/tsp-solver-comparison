@@ -114,7 +114,7 @@ class Genetic(TSPSolver):
             if self.calculate_tour_cost(candidate) < self.calculate_tour_cost(best):
                 best = candidate[:]
 
-        return best + [best[0]]
+        return [int(x) for x in best] + [int(best[0])]
 
     def _initialize_population(self, nodes: np.ndarray, edges: np.ndarray) -> List[List[int]]:
         """One greedy tour plus random permutations to fill the rest of the population."""

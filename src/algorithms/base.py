@@ -89,7 +89,8 @@ class TSPSolver(ABC):
         directory: str,
         problem_id: int,
         plot: bool = False,
-    ):
+        write_results: bool = True,
+    ) -> dict:
         """
         Runs the solver from start to finish on a problem instance.
 
@@ -140,15 +141,17 @@ class TSPSolver(ABC):
         print("6. Printing results")
         self.print_results()
 
-        print("7. Saving results")
-        self.save_results()
-        print(f"   -> {self.results_dir / 'results.json'}")
+        if write_results:
+            print("7. Saving results")
+            self.save_results()
+            print(f"   -> {self.results_dir / 'results.json'}")
 
         if plot and self.result["tour"]:
             print("8. Making plot of solution")
             self.plot_solution()
 
         print("Done!")
+        return dict(self.result)
 
     def check_solution_validity(self, tour: list[int] | None):
         """Checks if the tour is valid.
