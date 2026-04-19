@@ -201,10 +201,10 @@ class TSPSolver(ABC):
         if tour is None:
             tour = self.result["tour"]
         total_cost = 0
-        n = len(self.result["tour"])
+        n = len(tour)
         for k in range(n):
-            i = self.result["tour"][k]
-            j = self.result["tour"][(k + 1) % n]  # Connects back to start
+            i = tour[k]
+            j = tour[(k + 1) % n]  # Connects back to start
             total_cost += self.edges[i, j]
 
         return float(total_cost)

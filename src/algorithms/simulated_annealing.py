@@ -56,55 +56,48 @@ class SimulatedAnnealing(TSPSolver):
         ----------
             - List[int]: The tour that was found, include the return to the first node in your solution
         """
-        size = nodes.shape[0]
         MAX_ITERATIONS = 10000
 
         current = get_greeedy_initial_solution(nodes, edges)
-        best = current
-
-        print(best)
+        best = current[:]
 
         for t in range(MAX_ITERATIONS):
-            print(t)
             T = self.schedule(t)
 
-            # Fully cooled down return best found solution
-            if T == 0:
-                return best
+            if T < 1e-10:
+                return best + [best[0]]
 
-            next = self.two_opt(current, edges)
+            next_tour = self.two_opt(current)
 
             delta = self.calculate_tour_cost(
-                next + [next[0]]
+                next_tour + [next_tour[0]]
             ) - self.calculate_tour_cost(current + [current[0]])
 
-            print(delta)
-
             if delta < 0:
-                current = next
+                current = next_tour
                 if self.calculate_tour_cost(
                     current + [current[0]]
                 ) < self.calculate_tour_cost(best + [best[0]]):
-                    best = current
+                    best = current[:]
 
             else:
                 if np.random.binomial(1, np.exp(-delta / T), 1) == 1:
-                    current = next
+                    current = next_tour
 
-        # append wrapparound
         return best + [best[0]]
 
-    def two_opt(self, tour, edges):
+    def two_opt(self, tour):
         n = len(tour)
+        next_tour = tour[:]
 
         i = np.random.randint(n)
         j = np.random.randint(n)
+        if i > j:
+            i, j = j, i
 
-        # reverse segment between i and j
+        next_tour[i : j + 1] = reversed(next_tour[i : j + 1])
 
-        tour[i : j + 1] = reversed(tour[i : j + 1])
-
-        return tour
+        return next_tour
 
     def schedule(self, T: int) -> float:
         """Returns the temperature at time t. according to geometric schedule"""
