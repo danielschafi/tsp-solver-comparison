@@ -60,6 +60,35 @@ matplotlib
 pandas
 ```
 
+## Concorde
+
+### Create a folder for the solver
+
+```bash
+mkdir -p bin/ && cd bin/
+```
+
+### Download the pre-compiled binary
+
+```bash
+wget https://www.math.uwaterloo.ca/tsp/concorde/downloads/codes/linux24/concorde.gz
+```
+
+### Decompress and set permissions
+
+```bash
+gunzip concorde.gz
+chmod +x concorde
+```
+
+### Verify it works
+
+```bash
+./concorde -h
+./concorde -s 99 -k 100
+```
+
+
 ## Running the Benchmark
 
 1. Generate tsp problems
