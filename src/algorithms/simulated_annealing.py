@@ -5,7 +5,7 @@ from typing import List
 import numpy as np
 
 from src.algorithms.base import TSPSolver
-from src.utils.shared_util_funcs import get_greeedy_initial_solution
+from src.utils.shared_util_funcs import get_greeedy_initial_solution, two_opt_move
 
 np.random.seed(42)
 
@@ -58,7 +58,8 @@ class SimulatedAnnealing(TSPSolver):
         """
         MAX_ITERATIONS = 10000
 
-        current = get_greeedy_initial_solution(nodes, edges)
+        # Greedy returns a closed tour; strip the closing node — SA works with open tours
+        current = get_greeedy_initial_solution(nodes, edges)[:-1]
         best = current[:]
 
         for t in range(MAX_ITERATIONS):
@@ -67,17 +68,15 @@ class SimulatedAnnealing(TSPSolver):
             if T < 1e-10:
                 return best + [best[0]]
 
-            next_tour = self.two_opt(current)
+            next_tour = two_opt_move(current)
 
-            delta = self.calculate_tour_cost(
-                next_tour + [next_tour[0]]
-            ) - self.calculate_tour_cost(current + [current[0]])
+            delta = self.calculate_tour_cost(next_tour) - self.calculate_tour_cost(
+                current
+            )
 
             if delta < 0:
                 current = next_tour
-                if self.calculate_tour_cost(
-                    current + [current[0]]
-                ) < self.calculate_tour_cost(best + [best[0]]):
+                if self.calculate_tour_cost(current) < self.calculate_tour_cost(best):
                     best = current[:]
 
             else:
@@ -85,19 +84,6 @@ class SimulatedAnnealing(TSPSolver):
                     current = next_tour
 
         return best + [best[0]]
-
-    def two_opt(self, tour):
-        n = len(tour)
-        next_tour = tour[:]
-
-        i = np.random.randint(n)
-        j = np.random.randint(n)
-        if i > j:
-            i, j = j, i
-
-        next_tour[i : j + 1] = reversed(next_tour[i : j + 1])
-
-        return next_tour
 
     def schedule(self, T: int) -> float:
         """Returns the temperature at time t. according to geometric schedule"""

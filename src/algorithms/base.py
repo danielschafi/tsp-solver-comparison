@@ -188,8 +188,8 @@ class TSPSolver(ABC):
 
     def calculate_tour_cost(self, tour=None):
         """
-        Calculate tour cost by summing up edge weights along the tour
-        Assumes tour is a list of node indices: [0, 5, 2, 1]
+        Calculate tour cost by summing up edge weights along the tour.
+        Accepts both open tours [0, 5, 2, 1] and closed tours [0, 5, 2, 1, 0].
         """
         assert self.edges is not None
 

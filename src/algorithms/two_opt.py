@@ -1,83 +1,49 @@
 import argparse
-import random
 from pathlib import Path
 from typing import List
 
 import numpy as np
 
 from src.algorithms.base import TSPSolver
+from src.utils.shared_util_funcs import get_greeedy_initial_solution
 
 
 class TwoOpt(TSPSolver):
     """
     Basic 2-opt local search for the Traveling Salesman Problem.
 
-    The algorithm starts with a random permutation of the nodes and iteratively
-    removes two edges and reconnects the tour in a shorter way if possible.
-    This implementation uses first‑improvement and restarts after every successful move.
+    Starts from a greedy initial solution and iteratively removes two edges and
+    reconnects the tour in a shorter way. Uses first-improvement and restarts
+    after every successful move.
     """
 
     def __init__(self, time_limit: float | None = None):
         super().__init__("TwoOpt", time_limit)
 
-    def _tour_length(self, tour: List[int], edges: np.ndarray) -> float:
-        """Compute the total length of a closed tour."""
-        total = 0.0
-        n = len(tour)
-        for i in range(n):
-            a = tour[i]
-            b = tour[(i + 1) % n]
-            total += edges[a, b]
-        return total
-
     def solve_tsp(self, nodes: np.ndarray, edges: np.ndarray) -> List[int]:
-        """
-        Solve the TSP using the 2-opt local search heuristic.
+        # Greedy returns a closed tour; strip the closing node for improvement
+        tour = get_greeedy_initial_solution(nodes, edges)[:-1]
+        tour = self._improve(tour, edges)
+        return tour + [tour[0]]
 
-        Steps:
-        1. Create a random initial tour.
-        2. Repeatedly scan all pairs of non‑adjacent edges.
-        3. If reversing the segment between them shortens the tour, apply the move
-           and restart scanning.
-        4. Stop when a full scan finds no improvement.
-        """
-        n = len(nodes)
-        # 1. Random initial tour (closed loop: first city repeated at the end)
-        tour = list(range(n))
-        random.shuffle(tour)
-        tour.append(tour[0])          # close the cycle
-
+    def _improve(self, tour: List[int], edges: np.ndarray) -> List[int]:
+        """Exhaustive 2-opt improvement until no improving move exists (first-improvement)."""
+        tour = tour[:]
+        n = len(tour)
         improved = True
         while improved:
             improved = False
-            # i is the first edge (i, i+1), j is the second edge (j, j+1)
-            # We ensure edges are non-adjacent: j >= i+2
-            for i in range(0, n - 2):                # up to second-last edge
-                for j in range(i + 2, n):            # j can go up to last edge (j=n-1 gives edge between last and first node)
-                    # Wrap-around index for j+1
+            for i in range(n - 2):
+                for j in range(i + 2, n):
                     j1 = (j + 1) % n
-
-                    # Current two edges
                     a, b = tour[i], tour[i + 1]
                     c, d = tour[j], tour[j1]
-
-                    # Cost of current edges
-                    current_cost = edges[a, b] + edges[c, d]
-                    # Cost if we reconnect by reversing the segment (i+1 ... j)
-                    new_cost = edges[a, c] + edges[b, d]
-
-                    if new_cost < current_cost:
-                        # Apply 2-opt move: reverse the segment from i+1 to j (inclusive)
+                    if edges[a, c] + edges[b, d] < edges[a, b] + edges[c, d]:
                         tour[i + 1 : j + 1] = reversed(tour[i + 1 : j + 1])
                         improved = True
-                        break          # break inner loop after a successful move
+                        break
                 if improved:
-                    break              # break outer loop and restart scanning
-
-        # Ensure the tour is correctly closed (already is, but for safety)
-        if tour[-1] != tour[0]:
-            tour.append(tour[0])
-
+                    break
         return tour
 
 
