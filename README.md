@@ -96,5 +96,5 @@ uv run -m src.utils.plot_one_problem --problem <path> --algorithm <algorithm tha
 - save: if provided saves the plot
 
 ## References
-
+- [Handbook of Metaheuristics - Large Neighborhood Search](https://link.springer.com/chapter/10.1007/978-3-319-91086-4_4)
 - [Local Search and Metaheuristics for the Traveling Salesman Problem](https://leeds-faculty.colorado.edu/glover/Publications/TSP.pdf): Overview over some solution methods, not that mathematical

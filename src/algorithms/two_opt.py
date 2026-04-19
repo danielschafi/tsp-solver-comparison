@@ -5,7 +5,7 @@ from typing import List
 import numpy as np
 
 from src.algorithms.base import TSPSolver
-from src.utils.shared_util_funcs import get_greeedy_initial_solution
+from src.utils.shared_util_funcs import apply_two_opt_improvement, get_greeedy_initial_solution
 
 
 class TwoOpt(TSPSolver):
@@ -23,28 +23,8 @@ class TwoOpt(TSPSolver):
     def solve_tsp(self, nodes: np.ndarray, edges: np.ndarray) -> List[int]:
         # Greedy returns a closed tour; strip the closing node for improvement
         tour = get_greeedy_initial_solution(nodes, edges)[:-1]
-        tour = self._improve(tour, edges)
+        tour = apply_two_opt_improvement(tour, edges)
         return tour + [tour[0]]
-
-    def _improve(self, tour: List[int], edges: np.ndarray) -> List[int]:
-        """Exhaustive 2-opt improvement until no improving move exists (first-improvement)."""
-        tour = tour[:]
-        n = len(tour)
-        improved = True
-        while improved:
-            improved = False
-            for i in range(n - 2):
-                for j in range(i + 2, n):
-                    j1 = (j + 1) % n
-                    a, b = tour[i], tour[i + 1]
-                    c, d = tour[j], tour[j1]
-                    if edges[a, c] + edges[b, d] < edges[a, b] + edges[c, d]:
-                        tour[i + 1 : j + 1] = reversed(tour[i + 1 : j + 1])
-                        improved = True
-                        break
-                if improved:
-                    break
-        return tour
 
 
 def main():
