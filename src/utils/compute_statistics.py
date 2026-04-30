@@ -39,7 +39,9 @@ def compute_stats(records: list[dict]) -> list[dict]:
         groups[key].append(r)
 
     rows = []
-    for (algorithm, ptype, size), recs in sorted(groups.items(), key=lambda kv: (kv[0][1], kv[0][2], kv[0][0])):
+    for (algorithm, ptype, size), recs in sorted(
+        groups.items(), key=lambda kv: (kv[0][1], kv[0][2], kv[0][0])
+    ):
         valid = [r for r in recs if r.get("valid_solution", True)]
         costs = np.array([r["tour_cost"] for r in valid])
         times = np.array([r["time_to_solve"] for r in valid])
@@ -51,21 +53,23 @@ def compute_stats(records: list[dict]) -> list[dict]:
             if b and b > 0:
                 gaps.append((r["tour_cost"] - b) / b * 100)
 
-        rows.append({
-            "algorithm": algorithm,
-            "problem_type": ptype,
-            "problem_size": size,
-            "n_instances": len(recs),
-            "n_valid": len(valid),
-            "mean_cost": float(np.mean(costs)) if len(costs) else float("nan"),
-            "std_cost": float(np.std(costs)) if len(costs) else float("nan"),
-            "min_cost": float(np.min(costs)) if len(costs) else float("nan"),
-            "max_cost": float(np.max(costs)) if len(costs) else float("nan"),
-            "mean_time_s": float(np.mean(times)) if len(times) else float("nan"),
-            "std_time_s": float(np.std(times)) if len(times) else float("nan"),
-            "mean_gap_pct": float(np.mean(gaps)) if gaps else float("nan"),
-            "std_gap_pct": float(np.std(gaps)) if gaps else float("nan"),
-        })
+        rows.append(
+            {
+                "algorithm": algorithm,
+                "problem_type": ptype,
+                "problem_size": size,
+                "n_instances": len(recs),
+                "n_valid": len(valid),
+                "mean_cost": float(np.mean(costs)) if len(costs) else float("nan"),
+                "std_cost": float(np.std(costs)) if len(costs) else float("nan"),
+                "min_cost": float(np.min(costs)) if len(costs) else float("nan"),
+                "max_cost": float(np.max(costs)) if len(costs) else float("nan"),
+                "mean_time_s": float(np.mean(times)) if len(times) else float("nan"),
+                "std_time_s": float(np.std(times)) if len(times) else float("nan"),
+                "mean_gap_pct": float(np.mean(gaps)) if gaps else float("nan"),
+                "std_gap_pct": float(np.std(gaps)) if gaps else float("nan"),
+            }
+        )
     return rows
 
 
@@ -111,9 +115,15 @@ def save_csv(rows: list[dict], path: Path) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Compute aggregated benchmark statistics.")
-    parser.add_argument("--results", default="results/results.json", help="Path to results JSON.")
-    parser.add_argument("--csv", default=None, metavar="PATH", help="Save stats to CSV file.")
+    parser = argparse.ArgumentParser(
+        description="Compute aggregated benchmark statistics."
+    )
+    parser.add_argument(
+        "--results", default="results/results.json", help="Path to results JSON."
+    )
+    parser.add_argument(
+        "--csv", default=None, metavar="PATH", help="Save stats to CSV file."
+    )
     args = parser.parse_args()
 
     records = load_results(Path(args.results))

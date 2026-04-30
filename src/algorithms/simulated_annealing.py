@@ -7,10 +7,12 @@ import numpy as np
 from src.algorithms.base import TSPSolver
 from src.utils.shared_util_funcs import get_greeedy_initial_solution, two_opt_move
 
+
 class SimulatedAnnealing(TSPSolver):
     def __init__(self, time_limit: float | None = None):
         super().__init__("SimulatedAnnealing", time_limit)
         self.T_0: float = 0.1
+
     def setup_problem(self, directory: str, problem_id: int):
         super().setup_problem(directory, problem_id)
         random_tour = list(np.random.permutation(len(self.nodes)))

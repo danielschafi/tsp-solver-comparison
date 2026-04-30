@@ -101,7 +101,10 @@ def main() -> None:
     parser.add_argument("--skip-concorde", action="store_true", help="Skip Concorde.")
     parser.add_argument("--workers", type=int, default=os.cpu_count(), metavar="N")
     parser.add_argument(
-        "--save-every", type=int, default=50, metavar="N",
+        "--save-every",
+        type=int,
+        default=50,
+        metavar="N",
         help="Flush results to disk every N completions (default: 50).",
     )
     args = parser.parse_args()
@@ -129,7 +132,8 @@ def main() -> None:
         for name in solver_names
     ]
     tasks = [
-        t for t in all_tasks
+        t
+        for t in all_tasks
         if (ALGORITHM_NAMES[t[0]], str(Path(t[1]) / t[2])) not in existing_keys
     ]
 

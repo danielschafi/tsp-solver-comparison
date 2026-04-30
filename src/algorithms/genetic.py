@@ -116,7 +116,9 @@ class Genetic(TSPSolver):
 
         return [int(x) for x in best] + [int(best[0])]
 
-    def _initialize_population(self, nodes: np.ndarray, edges: np.ndarray) -> List[List[int]]:
+    def _initialize_population(
+        self, nodes: np.ndarray, edges: np.ndarray
+    ) -> List[List[int]]:
         """One greedy tour plus random permutations to fill the rest of the population."""
         n = nodes.shape[0]
         greedy = get_greeedy_initial_solution(nodes, edges)[:-1]
@@ -125,7 +127,9 @@ class Genetic(TSPSolver):
             population.append(list(np.random.permutation(n)))
         return population
 
-    def _tournament_select(self, population: List[List[int]], costs: List[float]) -> List[int]:
+    def _tournament_select(
+        self, population: List[List[int]], costs: List[float]
+    ) -> List[int]:
         """Return the lowest-cost individual from a random sample of TOURNAMENT_SIZE."""
         indices = np.random.choice(len(population), size=TOURNAMENT_SIZE, replace=False)
         best_idx = min(indices, key=lambda i: costs[i])

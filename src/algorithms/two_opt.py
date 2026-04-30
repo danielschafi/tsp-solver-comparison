@@ -5,7 +5,10 @@ from typing import List
 import numpy as np
 
 from src.algorithms.base import TSPSolver
-from src.utils.shared_util_funcs import apply_two_opt_improvement, get_greeedy_initial_solution
+from src.utils.shared_util_funcs import (
+    apply_two_opt_improvement,
+    get_greeedy_initial_solution,
+)
 
 
 class TwoOpt(TSPSolver):

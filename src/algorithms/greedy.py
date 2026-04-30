@@ -6,6 +6,7 @@ import numpy as np
 
 from src.algorithms.base import TSPSolver
 
+
 class Greedy(TSPSolver):
     def __init__(self, time_limit: float | None = None):
         super().__init__("Greedy", time_limit)
