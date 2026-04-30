@@ -79,6 +79,7 @@ def print_table(rows: list[dict]) -> None:
 
 def format_table(rows: list[dict]) -> str:
     import io
+
     buf = io.StringIO()
     header = (
         f"{'Algorithm':<25} {'Type':<10} {'n':>4} {'Size':>5}  "
@@ -127,7 +128,6 @@ def save_csv(rows: list[dict], path: Path) -> None:
 
 
 def main() -> None:
-<<<<<<< HEAD
     parser = argparse.ArgumentParser(
         description="Compute aggregated benchmark statistics."
     )
@@ -137,12 +137,9 @@ def main() -> None:
     parser.add_argument(
         "--csv", default=None, metavar="PATH", help="Save stats to CSV file."
     )
-=======
-    parser = argparse.ArgumentParser(description="Compute aggregated benchmark statistics.")
-    parser.add_argument("--results", default="results/results.json", help="Path to results JSON.")
-    parser.add_argument("--csv", default=None, metavar="PATH", help="Save stats to CSV file.")
-    parser.add_argument("--txt", default=None, metavar="PATH", help="Save stats to text file.")
->>>>>>> ee49b8e09ce8896485139087b1b524cf6f9b6a7b
+    parser.add_argument(
+        "--txt", default=None, metavar="PATH", help="Save stats to text file."
+    )
     args = parser.parse_args()
 
     records = load_results(Path(args.results))
