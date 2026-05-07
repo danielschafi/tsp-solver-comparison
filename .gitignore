@@ -1,3 +1,9 @@
+*.aux
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+
 data/*
 .vscode
 .idea
