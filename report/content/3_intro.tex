@@ -9,11 +9,13 @@ A solution to the TSP is an ordering of cities \( (v_{\pi(1)}, v_{\pi(2)}, \ldot
 	\left( \sum_{i=1}^{n-1} d(v_{\pi(i)}, v_{\pi(i+1)}) \right) + d(v_{\pi(n)}, v_{\pi(1)})
 	\label{eq:tsp-def}
 \end{equation}
+\cite{garey2002computers}
 
-
-
-
-Complexity: Explain why it matters (NP-hard, combinatorial explosion where brute force requires $O(n!)$ operations).
-
-
-The Heuristic Objective: Explain that because exact solutions scale terribly, we trade a guarantee of absolute optimality for speed, aiming for "reasonably good" solutions
+This is an NP-hard combinatorial optimization problem. That means, that there is no known polynomial time algorithm, that can solve it optimally for all instances \cite{garey2002computers}.
+It is so hard to solve, because the number of possible tours is \( (n-1)!/2 \) and grows with \( \mathcal{O}(n!) \).
+This makes it infeasible to brute-force a solution for problems with more than a few nodes. A problem with 100 nodes has \( 10^{155} \) possible tours,
+to check all of them naively would take longer than the age of the universe.
+Because we don't gave that kind of time, we need to find ways to quickly find solutions to TSPs that are \textit{good enough},
+meaning that they are not optimal, but sufficiently close to the optimal solution.
+However, for a lot of applications a solution that is not quite optimal is all that is needed.
+Heuristics are used to find these near optimal solutions within reasonable time.
