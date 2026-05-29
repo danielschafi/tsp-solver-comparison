@@ -5,6 +5,25 @@
 \subsection{Simulated Annealing}
 \subsection{Tabu Search}
 \subsection{Iterative Local Search}
+\begin{algorithm}[H]
+	\caption{Iterated Local Search}
+	\label{alg:ils}
+	\begin{algorithmic}[1]
+		\STATE $s_0 = \text{GenerateInitialSolution}()$
+		\STATE $s^* = \text{LocalSearch}(s_0)$
+		\STATE $s_{\text{best}} = s^*$
+		\REPEAT
+		\STATE $s' = \text{Perturbation}(s^*)$
+		\STATE $s^{*\prime} = \text{LocalSearch}(s')$
+		\IF{$\text{Cost}(s^{*\prime}) < \text{Cost}(s_{\text{best}})$}
+		\STATE $s_{\text{best}} = s^{*\prime}$
+		\ENDIF
+		\IF{$\text{Cost}(s^{*\prime}) < \text{Cost}(s^*)$}
+		\STATE $s^* = s^{*\prime}$
+		\ENDIF
+		\UNTIL{termination condition met (e.g., $\text{iterations} = 200$)}
+		\RETURN $s_{\text{best}}$
+	\end{algorithmic}
+\end{algorithm}
 \subsection{Genetic Algorithm}
-
 
