@@ -1,14 +1,17 @@
 \section{Introduction}
 
-%\section{Identified problem}
-The traveling sailsman problem is a solved
+The traveling salesman problem (TSP) is a classic combinatorial optimization problem that asks for the shortest possible route that visits a set of cities and returns to the origin city.
+More formally, given a complete Graph \( G=(V,E) \), where \( V = \{v_{1},v_{2},\ldots ,v_n\} \) is the set of nodes representing the cities,
+and \( d(v_i,v_j) \) is the distance associated with the edge between each pair of nodes \( v_i,v_j \in V \).
+A solution to the TSP is an ordering of cities \( (v_{\pi(1)}, v_{\pi(2)}, \ldots  , v_{\pi(n)})\) that minimizes the total tour length:
 
-%\section{Focus of this Work}
+\begin{equation}
+	\left( \sum_{i=1}^{n-1} d(v_{\pi(i)}, v_{\pi(i+1)}) \right) + d(v_{\pi(n)}, v_{\pi(1)})
+	\label{eq:tsp-def}
+\end{equation}
 
-%\section{Thesis Organization}
 
-Problem Definition: Formally define the Traveling Salesman Problem (TSP).
-Use standard mathematical notation here: given a set of nodes (cities) $V$ and edge weights (distances) $d_{ij}$, find a permutation of cities that minimizes the total tour length:$$\min \sum_{i=1}^{n-1} d_{\pi(i), \pi(i+1)} + d_{\pi(n), \pi(1)}$$
+
 
 Complexity: Explain why it matters (NP-hard, combinatorial explosion where brute force requires $O(n!)$ operations).
 
