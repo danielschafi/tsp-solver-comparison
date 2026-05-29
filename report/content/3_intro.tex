@@ -1,9 +1,16 @@
 \section{Introduction}
 
-\section{Identified problem}
+%\section{Identified problem}
 The traveling sailsman problem is a solved
 
-\section{Focus of this Work}
+%\section{Focus of this Work}
 
-\section{Thesis Organization}
+%\section{Thesis Organization}
 
+Problem Definition: Formally define the Traveling Salesman Problem (TSP).
+Use standard mathematical notation here: given a set of nodes (cities) $V$ and edge weights (distances) $d_{ij}$, find a permutation of cities that minimizes the total tour length:$$\min \sum_{i=1}^{n-1} d_{\pi(i), \pi(i+1)} + d_{\pi(n), \pi(1)}$$
+
+Complexity: Explain why it matters (NP-hard, combinatorial explosion where brute force requires $O(n!)$ operations).
+
+
+The Heuristic Objective: Explain that because exact solutions scale terribly, we trade a guarantee of absolute optimality for speed, aiming for "reasonably good" solutions
