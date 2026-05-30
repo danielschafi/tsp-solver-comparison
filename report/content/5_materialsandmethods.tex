@@ -33,10 +33,10 @@ In its essence, iterated local search builds a chain of solutions by exploring t
 	\end{algorithmic}
 \end{algorithm}
 Iterated local search can be used with any heuristic optimization algorithm (\textit{LocalSearch}) that takes in a tour and returns one that is at least as good as the input.
-It starts from some kind of initial solution \( s_{0} \) that is improved by one iteration of the \textit{LocalSearch} algorithm, this is the current solution \( s^* \).
+It starts from some kind of initial solution \( s_{0} \) that is improved to \( s^* \) by one iteration of the \textit{LocalSearch} algorithm. This is the current solution.
 Then we try to improve \( s^* \) for a number of iterations or until a termination condition is met.
 
-For the algorithm to be able to escape the local neighborhood, instead of applying \textit{LocalSearch} directly to the current solution \( s^* \),
+For the algorithm to be able to escape the local neighborhood, instead of applying \textit{LocalSearch} directly to the current solution \( s^* \) again,
 first a change or \textit{Perturbation} is applied that leads to an intermediate solution \( s' \).
 Then \textit{LocalSearch} is applied to \( s' \) and we get a new candidate solution \( s^* ' \).
 If this candidate solution \( s^* ' \) has a better \textit{Cost} than the current one, it becomes the new current solution \( s^* \).
@@ -47,7 +47,7 @@ The \textit{Cost} is the function that is to be minimized by the algorithm.
 In the case of the TSP that is the length of the tour.
 
 The \textit{Perturbation} is the mechanism that allows the algorithm to escape local minima. This function should not be reversible by the \textit{LocalSearch}.
-So if the algorithm steps from \( s^*_1 \to s^*_2 \) it then should be unable to undo it \(  s_2^* \to  s_1^* \).
+So if the algorithm steps from \( s^*_1 \to s^*_2 \) it then should be unable to do \(  s_2^* \to  s_1^* \) in the same iteration.
 
 Usual choices, and what was also used in this study are 2-Opt for the \textit{LocalSearch} and 4-Opt for the \textit{Perturbation},
 this is a good choice because a 4-Opt move cannot be undone by a 2-Opt move and thereby return to the last starting point of the current iteration.
