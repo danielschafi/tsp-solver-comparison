@@ -25,7 +25,7 @@ ALGO_ORDER = [
     "TwoOpt",
     "SimulatedAnnealing",
     "TabuSearch",
-    "IterativeLocalSearch",
+    "IteratedLocalSearch",
     "Genetic",
     "Concorde",
 ]

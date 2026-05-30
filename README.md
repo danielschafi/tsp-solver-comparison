@@ -55,7 +55,7 @@ tsp-solver-comparison/
 │   │   ├── simulated_annealing.py
 │   │   ├── tabu_search.py
 │   │   ├── genetic.py            # Genetic algorithm
-│   │   ├── iterative_local_search.py
+│   │   ├── iterated_local_search.py
 │   │   └── concorde_solver.py    # Wrapper for Concorde exact solver
 │   ├── data_gen/
 │   │   └── generate_tsp_instances.py
@@ -194,7 +194,7 @@ uv run -m src.utils.plot_one_problem --problem <path> --algorithm <algorithm>
 ```
 
 - `--problem`: path to an instance, e.g. `data/uniform/100/0` or the full path to a `_nodes.npy`/`_edges.npy` file
-- `--algorithm`: algorithm name as stored in results (e.g. `Greedy`, `TwoOpt`, `SimulatedAnnealing`, `TabuSearch`, `Genetic`, `IterativeLocalSearch`, `Concorde`)
+- `--algorithm`: algorithm name as stored in results (e.g. `Greedy`, `TwoOpt`, `SimulatedAnnealing`, `TabuSearch`, `Genetic`, `IteratedLocalSearch`, `Concorde`)
 - `--save`: save the plot to disk instead of displaying
 
 ## Running a Single Algorithm

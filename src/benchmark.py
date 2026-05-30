@@ -14,10 +14,10 @@ from pathlib import Path
 
 import pandas as pd
 
+from algorithms.iterated_local_search import IteratedLocalSearch
 from src.algorithms.concorde_solver import ConcordeSolver
 from src.algorithms.genetic import Genetic
 from src.algorithms.greedy import Greedy
-from src.algorithms.iterative_local_search import IterativeLocalSearch
 from src.algorithms.simulated_annealing import SimulatedAnnealing
 from src.algorithms.tabu_search import TabuSearch
 from src.algorithms.two_opt import TwoOpt
@@ -28,7 +28,7 @@ SOLVERS: dict[str, type] = {
     "simulated_annealing": SimulatedAnnealing,
     "tabu_search": TabuSearch,
     "genetic": Genetic,
-    "iterative_local_search": IterativeLocalSearch,
+    "iterated_local_search": IteratedLocalSearch,
     "concorde": ConcordeSolver,
 }
 
@@ -43,7 +43,7 @@ ALGORITHM_NAMES: dict[str, str] = {
     "simulated_annealing": "SimulatedAnnealing",
     "tabu_search": "TabuSearch",
     "genetic": "Genetic",
-    "iterative_local_search": "IterativeLocalSearch",
+    "iterated_local_search": "IteratedLocalSearch",
     "concorde": "Concorde",
 }
 
