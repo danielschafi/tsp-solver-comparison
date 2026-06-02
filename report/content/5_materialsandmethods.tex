@@ -4,6 +4,44 @@ The goal is to introduce the reader to a variety of different techniques and con
 
 
 \subsection{2-Opt}
+2-Opt is one of the simplest and most widely used local search heuristics for the TSP \cite{regoLocalSearchMetaheuristics}.
+Starting from some initial tour, it repeatedly removes two non-adjacent edges and reconnects the resulting two paths in the only other possible way, which is the same as reversing the segment between the two cut points.
+A move is accepted whenever it strictly decreases the tour length.
+The neighborhood of a tour with \( n \) cities therefore contains \( \mathcal{O}(n^2) \) candidate moves.
+The search terminates in a local minimum, that is, a tour for which no single 2-Opt swap gives an improvement.
+
+In this study, the initial tour is constructed by a deterministic nearest-neighbor heuristic (seeded for reproducibility): starting from a fixed city, the next city is always chosen as the closest unvisited one until all cities are included.
+The 2-Opt search itself uses a \emph{first-improvement} strategy: as soon as an improving swap \( (i,j) \) is found, it is applied immediately and the scan is restarted from the beginning of the tour.
+This is repeated until a full pass over all pairs \( (i,j) \) finds no improving move, at which point the tour is 2-optimal.
+
+\begin{algorithm}[H]
+	\caption{2-Opt}
+	\label{alg:two-opt}
+	\begin{algorithmic}[1]
+		\STATE $s = \text{GreedyInitialTour}()$
+		\STATE $\textit{improved} \leftarrow \textbf{true}$
+		\WHILE{$\textit{improved}$}
+		\STATE $\textit{improved} \leftarrow \textbf{false}$
+		\FOR{$i = 0$ \TO $n-3$}
+		\FOR{$j = i+2$ \TO $n-1$}
+		\STATE $a, b \leftarrow s_i, s_{i+1}$
+		\STATE $c, d \leftarrow s_j, s_{(j+1) \bmod n}$
+		\IF{$d(a,c) + d(b,d) < d(a,b) + d(c,d)$}
+		\STATE reverse $s_{i+1 \ldots j}$
+		\STATE $\textit{improved} \leftarrow \textbf{true}$
+		\STATE \textbf{break out of both loops}
+		\ENDIF
+		\ENDFOR
+		\ENDFOR
+		\ENDWHILE
+		\RETURN $s$
+	\end{algorithmic}
+\end{algorithm}
+
+The improvement condition compares the cost of the two edges that would be removed, \( d(a,b) + d(c,d) \), with the cost of the two edges that would replace them, \( d(a,c) + d(b,d) \).
+Because the segment between the two cut points is simply reversed, no other edge weights change and the cost difference can be evaluated in constant time per candidate move.
+2-Opt is used here both as a single solver and as the embedded \textit{LocalSearch} of the Iterated Local Search algorithm described below.
+
 \subsection{Simulated Annealing}
 \subsection{Tabu Search}
 \subsection{Iterated Local Search}
