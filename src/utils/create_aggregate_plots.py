@@ -1,14 +1,20 @@
 """Create aggregated comparison plots from benchmark results.
 
 Usage:
-    uv run -m src.utils.create_aggregate_plots [--save] [--out results/plots]
+    uv run -m src.utils.create_aggregate_plots [--save] [--out results/plots] [--split]
 
-Produces five figures:
-  1. Time scaling      — mean solve time vs. problem size (log-log) per problem type
-  2. Solution quality  — mean tour cost vs. problem size per problem type
-  3. Optimality gap    — mean % gap above best-known vs. problem size (line plot)
-  4. Optimality gap    — mean % gap above best-known per algorithm/size (bar chart)
-  5. Gap heatmap       — algorithm × size grid, color = mean gap %
+Produces (without --split):
+  1. Time scaling      — two subplots (uniform + clustered) side-by-side
+  2. Solution quality  — side-by-side
+  3. Optimality gap lines — side-by-side
+  4. Optimality gap bars  — side-by-side
+  5. Gap heatmap          — side-by-side
+
+With --split:
+  Creates separate PNGs for uniform and clustered, e.g.:
+    time_scaling_uniform.png, time_scaling_clustered.png
+    solution_quality_uniform.png, solution_quality_clustered.png
+    ...
 """
 
 import argparse
@@ -45,12 +51,200 @@ def _group_by(rows: list[dict], keys: list[str]) -> dict:
     return result
 
 
+# ----------------------------------------------------------------------
+# Single-axes plotting functions (used by --split)
+# ----------------------------------------------------------------------
+def _plot_time_on_ax(rows_subset: list[dict], ax: plt.Axes, ptype: str) -> None:
+    """Plot time scaling for a single problem type on a given axes."""
+    by_algo = _group_by(rows_subset, ["algorithm"])
+    for (algo,), grp in sorted(by_algo.items()):
+        grp_sorted = sorted(grp, key=lambda r: r["problem_size"])
+        sizes = [r["problem_size"] for r in grp_sorted]
+        times = [r["mean_time_s"] for r in grp_sorted]
+        errs = [r["std_time_s"] for r in grp_sorted]
+        ax.errorbar(
+            sizes,
+            times,
+            yerr=errs,
+            label=algo,
+            color=ALGO_COLOR.get(algo),
+            marker=ALGO_MARKER.get(algo),
+            linewidth=1.5,
+            markersize=6,
+            capsize=3,
+        )
+    ax.set_title(f"{ptype.capitalize()} instances")
+    ax.set_xlabel("Problem size (n)")
+    ax.set_ylabel("Mean solve time (s)")
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
+    ax.grid(True, which="both", linestyle="--", alpha=0.4)
+    ax.legend(fontsize=8)
+
+
+def _plot_quality_on_ax(rows_subset: list[dict], ax: plt.Axes, ptype: str) -> None:
+    """Plot solution quality for a single problem type."""
+    by_algo = _group_by(rows_subset, ["algorithm"])
+    for (algo,), grp in sorted(by_algo.items()):
+        grp_sorted = sorted(grp, key=lambda r: r["problem_size"])
+        sizes = [r["problem_size"] for r in grp_sorted]
+        costs = [r["mean_cost"] for r in grp_sorted]
+        errs = [r["std_cost"] for r in grp_sorted]
+        valid = [(s, c, e) for s, c, e in zip(sizes, costs, errs) if not np.isnan(c)]
+        if not valid:
+            continue
+        s, c, e = zip(*valid)
+        ax.errorbar(
+            s,
+            c,
+            yerr=e,
+            label=algo,
+            color=ALGO_COLOR.get(algo),
+            marker=ALGO_MARKER.get(algo),
+            linewidth=1.5,
+            markersize=6,
+            capsize=3,
+        )
+    ax.set_title(f"{ptype.capitalize()} instances")
+    ax.set_xlabel("Problem size (n)")
+    ax.set_ylabel("Mean tour cost")
+    ax.grid(True, linestyle="--", alpha=0.4)
+    ax.legend(fontsize=8)
+
+
+def _plot_gap_lines_on_ax(rows_subset: list[dict], ax: plt.Axes, ptype: str) -> None:
+    """Plot gap lines (mean % gap vs size) for a single problem type."""
+    by_algo = _group_by(rows_subset, ["algorithm"])
+    for (algo,), grp in sorted(by_algo.items()):
+        grp_sorted = sorted(grp, key=lambda r: r["problem_size"])
+        valid = [
+            (r["problem_size"], r["mean_gap_pct"], r["std_gap_pct"])
+            for r in grp_sorted
+            if not np.isnan(r["mean_gap_pct"])
+        ]
+        if not valid:
+            continue
+        sizes, gaps, errs = zip(*valid)
+        ax.errorbar(
+            sizes,
+            gaps,
+            yerr=errs,
+            label=algo,
+            color=ALGO_COLOR.get(algo),
+            marker=ALGO_MARKER.get(algo),
+            linewidth=1.5,
+            markersize=6,
+            capsize=3,
+        )
+    ax.set_title(f"{ptype.capitalize()} instances")
+    ax.set_xlabel("Problem size (n)")
+    ax.set_ylabel("Mean gap above best known (%)")
+    ax.grid(True, linestyle="--", alpha=0.4)
+    ax.legend(fontsize=8)
+
+
+def _plot_gap_bars_on_ax(rows_subset: list[dict], ax: plt.Axes, ptype: str) -> None:
+    """Plot gap bar chart for a single problem type."""
+    subset = [r for r in rows_subset if not np.isnan(r["mean_gap_pct"])]
+    if not subset:
+        ax.set_visible(False)
+        return
+
+    sizes = sorted({r["problem_size"] for r in subset})
+    algos = [a for a in ALGO_ORDER if any(r["algorithm"] == a for r in subset)]
+
+    x = np.arange(len(sizes))
+    width = 0.8 / max(len(algos), 1)
+
+    for i, algo in enumerate(algos):
+        gaps = []
+        errs = []
+        for size in sizes:
+            match = next(
+                (
+                    r
+                    for r in subset
+                    if r["algorithm"] == algo and r["problem_size"] == size
+                ),
+                None,
+            )
+            gaps.append(match["mean_gap_pct"] if match else 0)
+            errs.append(match["std_gap_pct"] if match else 0)
+        offset = (i - len(algos) / 2 + 0.5) * width
+        ax.bar(
+            x + offset,
+            gaps,
+            width,
+            label=algo,
+            color=ALGO_COLOR.get(algo),
+            alpha=0.85,
+            yerr=errs,
+            capsize=3,
+            error_kw={"linewidth": 1},
+        )
+
+    ax.set_title(f"{ptype.capitalize()} instances")
+    ax.set_xlabel("Problem size (n)")
+    ax.set_ylabel("Mean gap above best known (%)")
+    ax.set_xticks(x)
+    ax.set_xticklabels(sizes)
+    ax.grid(axis="y", linestyle="--", alpha=0.4)
+    ax.legend(fontsize=8)
+
+
+def _plot_heatmap_on_ax(rows_subset: list[dict], ax: plt.Axes, ptype: str) -> None:
+    """Plot gap heatmap for a single problem type."""
+    sizes = sorted({r["problem_size"] for r in rows_subset})
+    algos = [a for a in ALGO_ORDER if any(r["algorithm"] == a for r in rows_subset)]
+
+    matrix = np.full((len(algos), len(sizes)), np.nan)
+    for i, algo in enumerate(algos):
+        for j, size in enumerate(sizes):
+            match = next(
+                (
+                    r
+                    for r in rows_subset
+                    if r["algorithm"] == algo and r["problem_size"] == size
+                ),
+                None,
+            )
+            if match and not np.isnan(match["mean_gap_pct"]):
+                matrix[i, j] = match["mean_gap_pct"]
+
+    masked = np.ma.array(matrix, mask=np.isnan(matrix))
+    im = ax.imshow(masked, aspect="auto", cmap="RdYlGn_r", vmin=0)
+    plt.colorbar(im, ax=ax, label="Mean gap (%)")
+
+    ax.set_xticks(range(len(sizes)))
+    ax.set_xticklabels(sizes)
+    ax.set_yticks(range(len(algos)))
+    ax.set_yticklabels(algos)
+    ax.set_xlabel("Problem size (n)")
+    ax.set_title(f"{ptype.capitalize()} — gap % heatmap")
+
+    for i in range(len(algos)):
+        for j in range(len(sizes)):
+            if not np.isnan(matrix[i, j]):
+                ax.text(
+                    j,
+                    i,
+                    f"{matrix[i, j]:.1f}",
+                    ha="center",
+                    va="center",
+                    fontsize=8,
+                )
+
+
+# ----------------------------------------------------------------------
+# Original side-by-side plotting functions (kept for default mode)
+# ----------------------------------------------------------------------
 def fig_time_scaling(
     rows: list[dict], ax_uniform: plt.Axes, ax_clustered: plt.Axes
 ) -> None:
+    # Same as original, unchanged
     axes_map = {"uniform": ax_uniform, "clustered": ax_clustered}
     by_type_algo = _group_by(rows, ["problem_type", "algorithm"])
-
     for (ptype, algo), grp in sorted(by_type_algo.items()):
         ax = axes_map.get(ptype)
         if ax is None:
@@ -70,7 +264,6 @@ def fig_time_scaling(
             markersize=6,
             capsize=3,
         )
-
     for ptype, ax in axes_map.items():
         ax.set_title(f"{ptype.capitalize()} instances")
         ax.set_xlabel("Problem size (n)")
@@ -85,9 +278,9 @@ def fig_time_scaling(
 def fig_solution_quality(
     rows: list[dict], ax_uniform: plt.Axes, ax_clustered: plt.Axes
 ) -> None:
+    # Same as original
     axes_map = {"uniform": ax_uniform, "clustered": ax_clustered}
     by_type_algo = _group_by(rows, ["problem_type", "algorithm"])
-
     for (ptype, algo), grp in sorted(by_type_algo.items()):
         ax = axes_map.get(ptype)
         if ax is None:
@@ -111,7 +304,6 @@ def fig_solution_quality(
             markersize=6,
             capsize=3,
         )
-
     for ptype, ax in axes_map.items():
         ax.set_title(f"{ptype.capitalize()} instances")
         ax.set_xlabel("Problem size (n)")
@@ -121,6 +313,7 @@ def fig_solution_quality(
 
 
 def fig_gap_bars(rows: list[dict], axes: list[plt.Axes], ptypes: list[str]) -> None:
+    # Same as original (axes list corresponds to ptypes)
     for ax, ptype in zip(axes, ptypes):
         subset = [
             r
@@ -174,10 +367,10 @@ def fig_gap_bars(rows: list[dict], axes: list[plt.Axes], ptypes: list[str]) -> N
 
 
 def fig_gap_lines(rows: list[dict], axes: list[plt.Axes], ptypes: list[str]) -> None:
+    # Same as original
     for ax, ptype in zip(axes, ptypes):
         subset = [r for r in rows if r["problem_type"] == ptype]
         by_algo = _group_by(subset, ["algorithm"])
-
         for (algo,), grp in sorted(by_algo.items()):
             grp_sorted = sorted(grp, key=lambda r: r["problem_size"])
             valid = [
@@ -199,7 +392,6 @@ def fig_gap_lines(rows: list[dict], axes: list[plt.Axes], ptypes: list[str]) -> 
                 markersize=6,
                 capsize=3,
             )
-
         ax.set_title(f"{ptype.capitalize()} instances")
         ax.set_xlabel("Problem size (n)")
         ax.set_ylabel("Mean gap above best known (%)")
@@ -208,6 +400,7 @@ def fig_gap_lines(rows: list[dict], axes: list[plt.Axes], ptypes: list[str]) -> 
 
 
 def fig_gap_heatmap(rows: list[dict], axes: list[plt.Axes], ptypes: list[str]) -> None:
+    # Same as original
     for ax, ptype in zip(axes, ptypes):
         subset = [r for r in rows if r["problem_type"] == ptype]
         sizes = sorted({r["problem_size"] for r in subset})
@@ -251,6 +444,9 @@ def fig_gap_heatmap(rows: list[dict], axes: list[plt.Axes], ptypes: list[str]) -
                     )
 
 
+# ----------------------------------------------------------------------
+# Main
+# ----------------------------------------------------------------------
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Create aggregated TSP benchmark plots."
@@ -266,6 +462,11 @@ def main() -> None:
         default="results/plots",
         metavar="DIR",
         help="Output directory for saved figures.",
+    )
+    parser.add_argument(
+        "--split",
+        action="store_true",
+        help="Create separate PNG files for uniform and clustered (instead of side-by-side).",
     )
     args = parser.parse_args()
 
@@ -288,53 +489,91 @@ def main() -> None:
             plt.show()
         plt.close(fig)
 
-    # Figure 1: Time scaling
-    fig1, axes1 = plt.subplots(
-        1, len(ptypes), figsize=(6 * len(ptypes), 5), squeeze=False
-    )
-    fig1.suptitle("Time Scaling by Algorithm", fontsize=13, fontweight="bold")
-    ax_map = {ptype: axes1[0, i] for i, ptype in enumerate(ptypes)}
-    fig_time_scaling(
-        rows, ax_map.get("uniform", axes1[0, 0]), ax_map.get("clustered", axes1[0, -1])
-    )
-    _save_or_show(fig1, "time_scaling")
+    if args.split:
+        # Generate separate PNGs for each problem type and each figure type
+        for ptype in ptypes:
+            # Filter rows for this problem type
+            rows_pt = [r for r in rows if r["problem_type"] == ptype]
 
-    # Figure 2: Solution quality
-    fig2, axes2 = plt.subplots(
-        1, len(ptypes), figsize=(6 * len(ptypes), 5), squeeze=False
-    )
-    fig2.suptitle("Solution Quality by Algorithm", fontsize=13, fontweight="bold")
-    ax_map2 = {ptype: axes2[0, i] for i, ptype in enumerate(ptypes)}
-    fig_solution_quality(
-        rows,
-        ax_map2.get("uniform", axes2[0, 0]),
-        ax_map2.get("clustered", axes2[0, -1]),
-    )
-    _save_or_show(fig2, "solution_quality")
+            # 1. Time scaling
+            fig1, ax1 = plt.subplots(figsize=(6, 5))
+            _plot_time_on_ax(rows_pt, ax1, ptype)
+            _save_or_show(fig1, f"time_scaling_{ptype}")
 
-    # Figure 3: Optimality gap line plot
-    fig3, axes3 = plt.subplots(
-        1, len(ptypes), figsize=(6 * len(ptypes), 5), squeeze=False
-    )
-    fig3.suptitle("Optimality Gap by Problem Size", fontsize=13, fontweight="bold")
-    fig_gap_lines(rows, list(axes3[0]), ptypes)
-    _save_or_show(fig3, "optimality_gap_lines")
+            # 2. Solution quality
+            fig2, ax2 = plt.subplots(figsize=(6, 5))
+            _plot_quality_on_ax(rows_pt, ax2, ptype)
+            _save_or_show(fig2, f"solution_quality_{ptype}")
 
-    # Figure 4: Optimality gap bars
-    fig4, axes4 = plt.subplots(
-        1, len(ptypes), figsize=(7 * len(ptypes), 5), squeeze=False
-    )
-    fig4.suptitle("Optimality Gap (% above best known)", fontsize=13, fontweight="bold")
-    fig_gap_bars(rows, list(axes4[0]), ptypes)
-    _save_or_show(fig4, "optimality_gap_bars")
+            # 3. Gap lines
+            fig3, ax3 = plt.subplots(figsize=(6, 5))
+            _plot_gap_lines_on_ax(rows_pt, ax3, ptype)
+            _save_or_show(fig3, f"optimality_gap_lines_{ptype}")
 
-    # Figure 5: Gap heatmap
-    fig5, axes5 = plt.subplots(
-        1, len(ptypes), figsize=(5 * len(ptypes), 5), squeeze=False
-    )
-    fig5.suptitle("Mean Gap Heatmap (algorithm × size)", fontsize=13, fontweight="bold")
-    fig_gap_heatmap(rows, list(axes5[0]), ptypes)
-    _save_or_show(fig5, "gap_heatmap")
+            # 4. Gap bars
+            fig4, ax4 = plt.subplots(figsize=(7, 5))
+            _plot_gap_bars_on_ax(rows_pt, ax4, ptype)
+            _save_or_show(fig4, f"optimality_gap_bars_{ptype}")
+
+            # 5. Heatmap
+            fig5, ax5 = plt.subplots(figsize=(5, 5))
+            _plot_heatmap_on_ax(rows_pt, ax5, ptype)
+            _save_or_show(fig5, f"gap_heatmap_{ptype}")
+    else:
+        # Original side-by-side behavior
+        # Figure 1: Time scaling
+        fig1, axes1 = plt.subplots(
+            1, len(ptypes), figsize=(6 * len(ptypes), 5), squeeze=False
+        )
+        fig1.suptitle("Time Scaling by Algorithm", fontsize=13, fontweight="bold")
+        ax_map = {ptype: axes1[0, i] for i, ptype in enumerate(ptypes)}
+        fig_time_scaling(
+            rows,
+            ax_map.get("uniform", axes1[0, 0]),
+            ax_map.get("clustered", axes1[0, -1]),
+        )
+        _save_or_show(fig1, "time_scaling")
+
+        # Figure 2: Solution quality
+        fig2, axes2 = plt.subplots(
+            1, len(ptypes), figsize=(6 * len(ptypes), 5), squeeze=False
+        )
+        fig2.suptitle("Solution Quality by Algorithm", fontsize=13, fontweight="bold")
+        ax_map2 = {ptype: axes2[0, i] for i, ptype in enumerate(ptypes)}
+        fig_solution_quality(
+            rows,
+            ax_map2.get("uniform", axes2[0, 0]),
+            ax_map2.get("clustered", axes2[0, -1]),
+        )
+        _save_or_show(fig2, "solution_quality")
+
+        # Figure 3: Gap lines
+        fig3, axes3 = plt.subplots(
+            1, len(ptypes), figsize=(6 * len(ptypes), 5), squeeze=False
+        )
+        fig3.suptitle("Optimality Gap by Problem Size", fontsize=13, fontweight="bold")
+        fig_gap_lines(rows, list(axes3[0]), ptypes)
+        _save_or_show(fig3, "optimality_gap_lines")
+
+        # Figure 4: Gap bars
+        fig4, axes4 = plt.subplots(
+            1, len(ptypes), figsize=(7 * len(ptypes), 5), squeeze=False
+        )
+        fig4.suptitle(
+            "Optimality Gap (% above best known)", fontsize=13, fontweight="bold"
+        )
+        fig_gap_bars(rows, list(axes4[0]), ptypes)
+        _save_or_show(fig4, "optimality_gap_bars")
+
+        # Figure 5: Heatmap
+        fig5, axes5 = plt.subplots(
+            1, len(ptypes), figsize=(5 * len(ptypes), 5), squeeze=False
+        )
+        fig5.suptitle(
+            "Mean Gap Heatmap (algorithm × size)", fontsize=13, fontweight="bold"
+        )
+        fig_gap_heatmap(rows, list(axes5[0]), ptypes)
+        _save_or_show(fig5, "gap_heatmap")
 
 
 if __name__ == "__main__":
