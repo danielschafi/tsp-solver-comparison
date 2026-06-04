@@ -43,6 +43,50 @@ Because the segment between the two cut points is simply reversed, no other edge
 2-Opt is used here both as a single solver and as the embedded \textit{LocalSearch} of the Iterated Local Search algorithm described below.
 
 \subsection{Simulated Annealing}
+Plain local search like 2-Opt always stops at the first local minimum it reaches, because it never accepts a move that makes the tour worse.
+Simulated Annealing fixes this by sometimes accepting worse tours on purpose, so that the search can escape a local minimum and keep looking for a better solution \cite{regoLocalSearchMetaheuristics}.
+
+How willing the algorithm is to accept a worse tour is controlled by a single number called \textit{temperature} \( T \).
+At each step a neighbor tour is created with one random 2-Opt move, and the change in tour length \( \Delta = \text{Cost}(\text{next}) - \text{Cost}(\text{current}) \) is computed.
+A better tour (\( \Delta < 0 \)) is always accepted.
+A worse tour is accepted only with probability \( e^{-\Delta / T} \).
+When \( T \) is high this probability is close to one, so many worse tours are accepted. When \( T \) is low it is close to zero, so the algorithm behaves almost like normal 2-Opt local search.
+
+The temperature is lowered after every step with a geometric cooling schedule, \( T(t) = T_0 \cdot 0.9999^{\,t} \).
+The starting temperature \( T_0 \) is not fixed but estimated for each problem so that the algorithm fits the scale of the distances:
+a few hundred random 2-Opt moves are sampled, the average of the worsening moves \( \overline{\Delta} \) (mean delta) is taken, and \( T_0 \) is set so that about \( 60\% \) of such moves would be accepted at the start, i.e. \( T_0 = \overline{\Delta} / \ln(1 / 0.6) \).
+The search starts from a greedy nearest-neighbor tour and runs for a fixed budget of \( 100\,000 \) iterations (or stops early once the temperature is practically zero), always returning the best tour seen so far.
+
+\begin{algorithm}[H]
+	\caption{Simulated Annealing}
+	\label{alg:sa}
+	\begin{algorithmic}[1]
+		\STATE $T_0 = \text{EstimateInitialTemperature}()$
+		\STATE $\textit{current} = \text{GreedyInitialTour}()$
+		\STATE $\textit{best} = \textit{current}$
+		\FOR{$t = 1$ \TO $\text{MaxIterations}$}
+		\STATE $T = T_0 \cdot 0.9999^{\,t}$
+		\IF{$T \approx 0$}
+		\RETURN $\textit{best}$
+		\ENDIF
+		\STATE $\textit{next} = \text{Random2OptMove}(\textit{current})$
+		\STATE $\Delta = \text{Cost}(\textit{next}) - \text{Cost}(\textit{current})$
+		\IF{$\Delta < 0$}
+		\STATE $\textit{current} = \textit{next}$
+		\IF{$\text{Cost}(\textit{current}) < \text{Cost}(\textit{best})$}
+		\STATE $\textit{best} = \textit{current}$
+		\ENDIF
+		\ELSE
+		\STATE accept $\textit{current} = \textit{next}$ with probability $e^{-\Delta / T}$
+		\ENDIF
+		\ENDFOR
+		\RETURN $\textit{best}$
+	\end{algorithmic}
+\end{algorithm}
+
+A random 2-Opt move is the same edge swap as in normal 2-Opt, but here the two cut points are chosen at random instead of by scanning for an improvement.
+This keeps each step cheap while still letting the temperature decide whether a worse tour is kept or thrown away.
+
 \subsection{Tabu Search}
 \subsection{Iterated Local Search}
 The idea of iterated local search is that instead of searching the whole space of all candidate solutions, we focus only on candidate solutions in the local neighborhood of an initial solution.
