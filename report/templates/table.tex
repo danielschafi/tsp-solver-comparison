@@ -1,0 +1,32 @@
+\begin{table}[H]
+    \centering
+    {% Gruppe für kompakte Tabelle
+    \renewcommand{\arraystretch}{1}
+    \begin{longtable}{
+        |>{\raggedright\arraybackslash}p{5cm}
+        |>{\raggedright\arraybackslash}p{5cm}|
+        }
+        \hline
+        Attributname & Json Path \\
+        \hline
+        app & \$.labels.app \\
+        \hline
+        filename & \$.name \\
+        \hline
+        ip & \$.labels.instance \\
+        \hline
+        job & \$.labels.job \\
+        \hline
+        lower\_equals & \$.labels.le \\
+        \hline
+        metric\_name & \$.name \\
+        \hline
+        quantile & \$.labels.quantile \\
+        \hline 
+        value & \$.value \\ 
+        \hline
+    \end{longtable}
+    }
+    \caption{Prometheus Konfiguration des EvaluateJsonPath-Prozessors welche Json j in die File Attribute geschrieben werden}
+    \label{tab:prometheus-attribute}
+\end{table}
