@@ -26,6 +26,9 @@ M.~R. Garey and D.~S. Johnson, \emph{Computers and Intractability}.\hskip 1em pl
 \bibitem{regoLocalSearchMetaheuristics}
 C.~Rego and F.~Glover, ``Local {{Search}} and {{Metaheuristics}} for the {{Traveling Salesman Problem}}.''
 
+\bibitem{gendreauTabuSearch2019}
+M.~Gendreau and J.-Y. Potvin, ``Tabu {{Search}},'' in \emph{Handbook of {{Metaheuristics}}}, M.~Gendreau and J.-Y. Potvin, Eds.\hskip 1em plus 0.5em minus 0.4em\relax Cham: Springer International Publishing, 2019, pp. 37--55.
+
 \bibitem{lourencoIteratedLocalSearch2019}
 H.~R. Louren{\c c}o, O.~C. Martin, and T.~St{\"u}tzle, ``Iterated {{Local Search}}: {{Framework}} and {{Applications}},'' in \emph{Handbook of {{Metaheuristics}}}, M.~Gendreau and J.-Y. Potvin, Eds.\hskip 1em plus 0.5em minus 0.4em\relax Cham: Springer International Publishing, 2019, pp. 129--168.
 

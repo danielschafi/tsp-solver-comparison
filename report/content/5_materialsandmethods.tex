@@ -42,6 +42,10 @@ The improvement condition compares the cost of the two edges that would be remov
 Because the segment between the two cut points is simply reversed, no other edge weights change and the cost difference can be evaluated in constant time per candidate move.
 2-Opt is used here both as a single solver and as the embedded \textit{LocalSearch} of the Iterated Local Search algorithm described below.
 
+
+
+
+
 \subsection{Simulated Annealing}
 Plain local search like 2-Opt always stops at the first local minimum it reaches, because it never accepts a move that makes the tour worse.
 Simulated Annealing fixes this by sometimes accepting worse tours on purpose, so that the search can escape a local minimum and keep looking for a better solution \cite{regoLocalSearchMetaheuristics}.
@@ -87,7 +91,101 @@ The search starts from a greedy nearest-neighbor tour and runs for a fixed budge
 A random 2-Opt move is the same edge swap as in normal 2-Opt, but here the two cut points are chosen at random instead of by scanning for an improvement.
 This keeps each step cheap while still letting the temperature decide whether a worse tour is kept or thrown away.
 
+
+
+
+
+
 \subsection{Tabu Search}
+\textcolor{red}{ready for proof reading}
+Tabu Search (TS) extends classical local search by using memory structures to escape local minima and to avoid cycling \cite{gendreauTabuSearch2019}.
+While a plain local search like 2-Opt stops at the first local optimum, 
+TS continues from there by accepting non-improving moves.
+To prevent the search from immediately undoing such a move and returning to the previous solution, 
+it keeps a \emph{tabu list} of recently performed moves. 
+Moves that are \emph{tabu} (forbidden) are not allowed unless they satisfy an \emph{aspiration criterion} (e.g., they lead to a new global best).
+
+In the algorithm implementation \ref{alg:tabu}, the search space is the set of all Hamiltonian tours.
+The neighborhood is defined by all 2-Opt swaps, giving $\mathcal{O}(n^2)$ candidate moves per iteration.
+The initial solution is constructed by the same greedy nearest-neighbor heuristic used for 2-Opt and Simulated Annealing.
+
+At each iteration, the algorithm examines the whole 2-Opt neighborhood of the current tour.
+For every pair $(i,j)$, it generates a neighbor by reversing the segment $i+1 \ldots j$ and computes its total length.
+A move is considered admissible if either it is not tabu, or its tour length is better than the best known solution (aspiration criterion).
+Among all admissible moves, the one with the smallest tour length is selected (\emph{best improvement} strategy).
+
+\begin{algorithm}[H]
+	\caption{Tabu Search}
+	\label{alg:tabu}
+	\begin{algorithmic}[1]
+		\STATE $n \gets \text{number of cities} \text{\textcolor{red}{should we use cities or nodes?}}$
+		\STATE $s \gets \text{GreedyInitialTour}()$ \COMMENT{without closing edge}
+		\STATE $s_{\text{best}} \gets s$
+		\STATE $\text{bestCost} \gets \text{Cost}(s_{\text{best}})$
+		\STATE $\text{tenure} \gets \max(7,\lfloor\sqrt{n}\rfloor)$
+		\STATE $\text{maxIter} \gets \max(50,\;5000//n)$
+		\STATE $\text{tabuList} \gets \text{empty queue}$
+		\FOR{$iter \gets 1$ \TO $\text{maxIter}$}
+			\STATE $\text{bestNeighbor} \gets \text{None}$
+			\STATE $\text{bestCostNeighbor} \gets \infty$
+			\STATE $\text{bestMove} \gets \text{None}$
+			\FOR{$i \gets 0$ \TO $n-2$}
+				\FOR{$j \gets i+1$ \TO $n-1$}
+					\STATE $s' \gets \text{ReverseSegment}(s, i, j)$
+					\STATE $c \gets \text{Cost}(s')$
+					\STATE $\text{isTabu} \gets (i,j) \in \text{tabuList}$
+					\IF{$(\neg\,\text{isTabu}$ \OR $c < \text{bestCost})$ \AND $c < \text{bestCostNeighbor}$}
+						\STATE $\text{bestNeighbor} \gets s'$
+						\STATE $\text{bestCostNeighbor} \gets c$
+						\STATE $\text{bestMove} \gets (i,j)$
+					\ENDIF
+				\ENDFOR
+			\ENDFOR
+			\IF{$\text{bestNeighbor} = \text{None}$} \STATE \textbf{break} \ENDIF
+			\STATE $s \gets \text{bestNeighbor}$
+			\STATE add $\text{bestMove}$ to $\text{tabuList}$
+			\IF{$\text{len}(\text{tabuList}) > \text{tenure}$}
+				\STATE remove oldest entry from $\text{tabuList}$
+			\ENDIF
+			\IF{$\text{bestCostNeighbor} < \text{bestCost}$}
+				\STATE $s_{\text{best}} \gets s$
+				\STATE $\text{bestCost} \gets \text{bestCostNeighbor}$
+			\ENDIF
+		\ENDFOR
+		\RETURN $s_{\text{best}}$ with closing edge
+	\end{algorithmic}
+\end{algorithm}
+
+The selected move is then applied to become the new current tour, and the move (represented as the pair $(i,j)$) is added to the tabu list.
+If the tabu list exceeds a given \emph{tabu tenure}, the oldest entry is removed.
+The tabu tenure is set to $\max(7, \lfloor\sqrt{n}\rfloor)$. 
+This value balances diversification and intensification.
+
+The search continues for a fixed number of iterations, which depends on the problem size: \newline
+$\text{max\_iterations} = \max(50,\, 5000 / n)$
+
+This scaling ensures that large instances are not overwhelmed by an excessive number of iterations, while small instances still receive enough exploration.
+The algorithm returns the best tour found over the whole search.
+
+The aspiration criterion used here is the simplest and most common one.
+A tabu move is allowed if it produces a tour strictly shorter than the global best tour found so far \cite[Sec. 2.3.5]{gendreauTabuSearch2019}.
+This guarantees that no improving move that would set a new record is ever rejected.
+The tabu list stores only the pair $(i,j)$ representing the inversion endpoints.
+This prevents the immediate reversal of that particular 2-Opt swap, 
+but does not forbid other moves that involve the same edges or cities, thus keeping the search sufficiently flexible.
+
+Compared to Simulated Annealing, Tabu Search uses a deterministic move selection rule (best admissible neighbor) 
+and relies on explicit memory to avoid cycles rather than on probabilistic acceptance.
+For the TSP, TS often finds very good solutions in a moderate number of iterations,
+because its best-improvement strategy aggressively descends toward local optima,
+while the tabu list provides just enough diversification to escape them.
+The implementation follows the classic template described in \cite[Sec. 2.3.6]{gendreauTabuSearch2019}.
+
+
+
+
+
+
 \subsection{Iterated Local Search}
 The idea of iterated local search is that instead of searching the whole space of all candidate solutions, we focus only on candidate solutions in the local neighborhood of an initial solution.
 These are usually generated by some kind of local search heuristic.
