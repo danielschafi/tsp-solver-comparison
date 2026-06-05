@@ -29,7 +29,16 @@ C.~Rego and F.~Glover, ``Local {{Search}} and {{Metaheuristics}} for the {{Trave
 \bibitem{gendreauTabuSearch2019}
 M.~Gendreau and J.-Y. Potvin, ``Tabu {{Search}},'' in \emph{Handbook of {{Metaheuristics}}}, M.~Gendreau and J.-Y. Potvin, Eds.\hskip 1em plus 0.5em minus 0.4em\relax Cham: Springer International Publishing, 2019, pp. 37--55.
 
+\bibitem{krishnakumarriyerTabuSearchAlgorithm2013}
+{Krishnakumar R Iyer}, ``Tabu search algorithm for a thermal aware {{VLSI}} floorplanning application,'' 2013.
+
+\bibitem{osmanMetastrategySimulatedAnnealing1993}
+I.~H. Osman, ``Metastrategy simulated annealing and tabu search algorithms for the vehicle routing problem,'' \emph{Annals of Operations Research}, vol.~41, no.~4, pp. 421--451, Dec. 1993.
+
 \bibitem{lourencoIteratedLocalSearch2019}
 H.~R. Louren{\c c}o, O.~C. Martin, and T.~St{\"u}tzle, ``Iterated {{Local Search}}: {{Framework}} and {{Applications}},'' in \emph{Handbook of {{Metaheuristics}}}, M.~Gendreau and J.-Y. Potvin, Eds.\hskip 1em plus 0.5em minus 0.4em\relax Cham: Springer International Publishing, 2019, pp. 129--168.
+
+\bibitem{whitleyNextGenerationGenetic2019}
+D.~Whitley, ``Next {{Generation Genetic Algorithms}}: {{A User}}'s {{Guide}} and {{Tutorial}},'' in \emph{Handbook of {{Metaheuristics}}}, M.~Gendreau and J.-Y. Potvin, Eds.\hskip 1em plus 0.5em minus 0.4em\relax Cham: Springer International Publishing, 2019, pp. 245--274.
 
 \end{thebibliography}
