@@ -33,20 +33,20 @@ Each instance is stored in two NumPy binary files (``.npy``):
     \item \texttt{\{id\}\_edges.npy}: an \(n \times n\) matrix of pairwise Euclidean distances.
 \end{itemize}
 The directory structure is:
-\begin{verbatim}
-data/
-├── uniform/
-│   ├── 10/
-│   │   ├── 0_nodes.npy
-│   │   ├── 0_edges.npy
-│   │   ├── 1_nodes.npy 
-│   │   ├── ...
-│   ├── 25/
-│   └── ...
-└── clustered/
-    ├── 10/
-    └── ...
-\end{verbatim}
+\dirtree{%
+.1 data/.
+.2 uniform/.
+.3 10/.
+.4 0\_nodes.npy.
+.4 0\_edges.npy.
+.4 1\_nodes.npy.
+.4 \dots.
+.3 25/.
+.3 \dots.
+.2 clustered/.
+.3 10/.
+.3 \dots.
+}
 
 \subsubsection{Test data option}
 The script also provides a \texttt{--testdata} flag that writes the generated instances into a separate \texttt{data/test/} directory. 
