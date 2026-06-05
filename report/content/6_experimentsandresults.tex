@@ -26,35 +26,6 @@ and its coordinates are drawn from a normal distribution around that center with
 The resulting coordinates are clipped to the unit square to keep all points inside \([0,1]^2\). 
 The distance matrix is then computed as for the uniform case.
 
-\subsubsection{Storage format}
-Each instance is stored in two NumPy binary files (``.npy``):
-\begin{itemize}
-    \item \texttt{\{id\}\_nodes.npy}: an \(n \times 2\) array of node coordinates.
-    \item \texttt{\{id\}\_edges.npy}: an \(n \times n\) matrix of pairwise Euclidean distances.
-\end{itemize}
-The directory structure is:
-\dirtree{%
-.1 data/.
-.2 uniform/.
-.3 10/.
-.4 0\_nodes.npy.
-.4 0\_edges.npy.
-.4 1\_nodes.npy.
-.4 \dots.
-.3 25/.
-.3 \dots.
-.2 clustered/.
-.3 10/.
-.3 \dots.
-}
-
-\subsubsection{Test data option}
-The script also provides a \texttt{--testdata} flag that writes the generated instances into a separate \texttt{data/test/} directory. 
-This can be used for hyperparameter tuning or preliminary experiments without interfering with the main benchmark dataset.
-
-All dataset generation parameters (random seed, cluster spread, number of repetitions) are kept constant throughout the experiments to ensure a consistent basis for comparison.
-
-
 \subsubsection{Benchmark}
 Mention greedy baseline
 
