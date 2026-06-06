@@ -1,11 +1,9 @@
 \section{Related Work}
-\textcolor{red}{ready for proofreading}
 
 The TSP is one of the most intensively studied combinatorial optimization problems.
 Its NP-hard nature \cite{garey2002computers} makes exact solution methods infeasible for large instances,
 yet the search for optimal solutions has driven significant progress in both exact and heuristic algorithms for solving the TSP
 but also in the area of combinatorial optimization as a whole.
-
 
 
 \paragraph{Exact Solvers}
@@ -15,10 +13,19 @@ The gold standard for exact solvers of the TSP is Concorde \cite{applegateCertif
 and was able to obtain an optimal tour for a problem with 85900 cities, computing it required over 136 CPU years \cite{applegateCertificationOptimalTSP2009}.
 While exact solvers are the gold standard for verifying solution quality, their runtime increases exponentially, limiting their applicability to large instances.
 
-\paragraph{Metaheuristics for the TSP}
-
+\paragraph{Heuristics and Metaheuristics for the TSP}
 
 To overcome the limitations of exact methods, researchers have developed a wide range of heuristic and metaheuristic algorithms that can find near-optimal solutions in reasonable time.
+
+\textcolor{blue}{Give overview over other reviews and why ours is different, what gap does it address}
+
+
+
+To the best of our knowledge, there is no other review that gives an overview over some of the most important solution approaches for TSP and directly compares their scaling behaviour on problems up to size 2000.
+
+
+
+
 A comprehensive survey of local search and metaheuristics for the TSP is provided by Rego and Glover \cite{regoLocalSearchMetaheuristics},
 which covers classical local search (2-Opt, 3-Opt) as well as advanced tabu search and ejection chain methods.
 
