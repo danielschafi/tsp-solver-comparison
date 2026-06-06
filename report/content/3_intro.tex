@@ -2,8 +2,8 @@
 
 The traveling salesman problem (TSP) is a classic combinatorial optimization problem that asks for the shortest possible route that visits a set of cities and returns to the origin city.
 More formally, given a complete Graph \( G=(V,E) \), where \( V = \{v_{1},v_{2},\ldots ,v_n\} \) is the set of nodes representing the cities,
-and \( d(v_i,v_j) \) is the distance associated with the edge between each pair of nodes \( v_i,v_j \in V \).
-A solution to the TSP is an ordering of cities \( (v_{\pi(1)}, v_{\pi(2)}, \ldots  , v_{\pi(n)})\) that minimizes the total tour length:
+and \( d(v_i,v_j) \) is the distance associated with the edge between each pair of nodes \( v_i,v_j \in V \), then
+the solution to a TSP is the ordering of cities \( (v_{\pi(1)}, v_{\pi(2)}, \ldots  , v_{\pi(n)})\) that minimizes the total tour length:
 
 \begin{equation}
 	\left( \sum_{i=1}^{n-1} d(v_{\pi(i)}, v_{\pi(i+1)}) \right) + d(v_{\pi(n)}, v_{\pi(1)})
