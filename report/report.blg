@@ -15,45 +15,45 @@ Warning--empty journal in regoLocalSearchMetaheuristics
 Warning--empty year in regoLocalSearchMetaheuristics
 
 Done.
-You've used 7 entries,
+You've used 9 entries,
             4087 wiz_defined-function locations,
-            863 strings with 8528 characters,
-and the built_in function-call counts, 4929 in all, are:
-= -- 376
-> -- 109
-< -- 37
-+ -- 55
-- -- 18
-* -- 243
-:= -- 754
-add.period$ -- 17
-call.type$ -- 7
-change.case$ -- 12
-chr.to.int$ -- 90
-cite$ -- 9
-duplicate$ -- 351
-empty$ -- 429
-format.name$ -- 25
-if$ -- 1125
+            879 strings with 9179 characters,
+and the built_in function-call counts, 6931 in all, are:
+= -- 539
+> -- 173
+< -- 57
++ -- 89
+- -- 30
+* -- 347
+:= -- 1041
+add.period$ -- 21
+call.type$ -- 9
+change.case$ -- 14
+chr.to.int$ -- 132
+cite$ -- 11
+duplicate$ -- 489
+empty$ -- 566
+format.name$ -- 39
+if$ -- 1591
 int.to.chr$ -- 0
-int.to.str$ -- 7
-missing$ -- 58
-newline$ -- 44
-num.names$ -- 13
-pop$ -- 151
+int.to.str$ -- 9
+missing$ -- 84
+newline$ -- 50
+num.names$ -- 15
+pop$ -- 203
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 2
-skip$ -- 369
+skip$ -- 518
 stack$ -- 0
-substring$ -- 216
-swap$ -- 272
-text.length$ -- 7
+substring$ -- 316
+swap$ -- 404
+text.length$ -- 13
 text.prefix$ -- 0
 top$ -- 5
-type$ -- 7
+type$ -- 9
 warning$ -- 2
-while$ -- 26
-width$ -- 8
-write$ -- 84
+while$ -- 36
+width$ -- 10
+write$ -- 106
 (There were 2 warnings)

@@ -1,6 +1,32 @@
 \section{Related Work}
-\begin{itemize}
-	\item Mention that exact solvers like Concorde use cutting-plane methods and branch-and-bound to find the true mathematical optimum.
-	\item Briefly reference classic literature (like the Glover paper mentioned in your README) regarding how local search and metaheuristics revolutionized combinatorial optimization.
-\end{itemize}
+\textcolor{red}{ready for proofreading}
 
+The TSP is one of the most intensively studied combinatorial optimization problems. 
+Its non-determistic polynomial-time hard nature \cite{garey2002computers} makes exact solution methods infeasible for large instances, 
+yet the quest for optimal solutions has driven significant progress in both exact and heuristic algorithms.
+
+\paragraph{Exact Solvers}
+The most prominent exact solver for the TSP is \textsc{Concorde}, 
+which combines cutting-plane methods, branch-and-bound, and linear programming relaxations to certify optimality. 
+Applegate et al. \cite{applegateCertificationOptimalTSP2009} demonstrated the power of this approach by certifying an optimal tour through 85,900 cities, 
+the largest problem instance in the Traveling Salesman Problem Library (TSPLIB) collection. 
+While exact solvers are the gold standard for verifying solution quality, their exponential worst-case complexity limits their applicability to very large instances.
+
+\paragraph{Metaheuristics for the TSP.}
+To overcome the limitations of exact methods, researchers have developed a wide range of heuristic and metaheuristic algorithms that can find near-optimal solutions in reasonable time. 
+A comprehensive survey of local search and metaheuristics for the TSP is provided by Rego and Glover \cite{regoLocalSearchMetaheuristics}, 
+which covers classical local search (2-Opt, 3-Opt) as well as advanced tabu search and ejection chain methods.
+
+Among the most influential metaheuristics, \textit{Simulated Annealing} (SA) introduced the idea of probabilistic acceptance of worsening moves to escape local optima. 
+
+\textit{Tabu Search} (TS), originally proposed by Glover \cite{regoLocalSearchMetaheuristics} and later refined by Gendreau and Potvin \cite{gendreauTabuSearch2019}, 
+uses explicit memory structures (tabu lists) to prevent cycling and guide the search. 
+
+\textit{Iterated Local Search} (ILS) \cite{lourencoIteratedLocalSearch2019} builds chains of local optima by perturbing solutions between applications of a local search, 
+achieving state-of-the-art performance on many problems. 
+
+\textit{Genetic Algorithms} (GAs) for the TSP are reviewed by Larra{\~n}aga et al. 
+\cite{larranagaGeneticAlgorithmsTravelling1999}, and more recent developments,
+including the EAX crossover that can find optimal tours for instances with up to 200,000 cities, are discussed by Whitley \cite{whitleyNextGenerationGenetic2019}.
+
+All of these metaheuristics form the basis of the algorithms implemented and compared in this study.
