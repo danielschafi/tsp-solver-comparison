@@ -47,6 +47,9 @@ D.~Whitley, ``Next {{Generation Genetic Algorithms}}: {{A User}}'s {{Guide}} and
 \bibitem{gendreauHandbookMetaheuristics2019}
 M.~Gendreau and J.-Y. Potvin, Eds., \emph{Handbook of {{Metaheuristics}}}, ser. International {{Series}} in {{Operations Research}} \& {{Management Science}}.\hskip 1em plus 0.5em minus 0.4em\relax Cham: Springer International Publishing, 2019, vol. 272.
 
+\bibitem{Delahaye2019}
+D.~Delahaye, S.~Chaimatanan, and M.~Mongeau, ``Simulated annealing: {{From}} basics to applications,'' in \emph{Handbook of Metaheuristics}, M.~Gendreau and J.-Y. Potvin, Eds.\hskip 1em plus 0.5em minus 0.4em\relax Cham: Springer International Publishing, 2019, pp. 1--35.
+
 \bibitem{krishnakumarriyerTabuSearchAlgorithm2013}
 {Krishnakumar R Iyer}, ``Tabu search algorithm for a thermal aware {{VLSI}} floorplanning application,'' 2013.
 

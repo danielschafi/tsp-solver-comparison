@@ -49,14 +49,14 @@ Because the segment between the two cut points is simply reversed, no other edge
 
 \subsection{Simulated Annealing}
 Plain local search like 2-Opt always stops at the first local minimum it reaches, because it never accepts a move that makes the tour worse.
-Simulated Annealing fixes this by sometimes accepting worse tours on purpose, so that the search can escape a local minimum and keep looking for a better solution \cite{regoLocalSearchMetaheuristics}.
+Simulated Annealing fixes this by sometimes accepting worse tours on purpose, so that the search can escape a local minimum and keep looking for a better solution \cite{Delahaye2019}.
 
 How willing the algorithm is to accept a worse tour is controlled by a single number called \textit{temperature} \( T \).
 At each step a neighbor tour is created with one random 2-Opt move, and the change in tour length \( \Delta = \text{Cost}(\text{next}) - \text{Cost}(\text{current}) \) is computed.
 A better tour (\( \Delta < 0 \)) is always accepted.
 A worse tour is accepted only with probability \( e^{-\Delta / T} \).
 When \( T \) is high this probability is close to one, so many worse tours are accepted. When \( T \) is low it is close to zero, so the algorithm behaves almost like normal 2-Opt local search.
-The temperature is lowered after every step with a geometric cooling schedule, \( T(t) = T_0 \cdot 0.9999^{\,t} \).
+The temperature is lowered after every step with a geometric cooling schedule, \( T(t) = T_0 \cdot 0.9999^{\,t} \) \cite{Delahaye2019}.
 
 To compare the algorithms in this study, the starting temperature \( T_0 \) is not fixed but estimated for each problem so that the algorithm fits the scale of the distances:
 a few hundred random 2-Opt moves are sampled, the average of the worsening moves \( \overline{\Delta} \) (mean delta) is taken, and \( T_0 \) is set so that about \( 60\% \) of such moves would be accepted at the start, i.e. \( T_0 = \overline{\Delta} / \ln(1 / 0.6) \).
