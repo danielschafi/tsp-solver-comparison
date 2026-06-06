@@ -5,7 +5,7 @@ The goal is to introduce the reader to a variety of different techniques and con
 
 \subsection{2-Opt}
 2-Opt is one of the simplest and most widely used local search heuristics for the TSP \cite{regoLocalSearchMetaheuristics}.
-Starting from some initial tour, it repeatedly removes two non-adjacent edges and reconnects the resulting two paths in the only other possible way, which is the same as reversing the segment between the two cut points.
+Starting from an initial tour, it repeatedly removes two non-adjacent edges and reconnects the resulting two paths in the only other possible way, which is the same as reversing the segment between the two cut points.
 A move is accepted whenever it strictly decreases the tour length.
 The neighborhood of a tour with \( n \) cities therefore contains \( \mathcal{O}(n^2) \) candidate moves.
 The search terminates in a local minimum, that is, a tour for which no single 2-Opt swap gives an improvement.
@@ -98,10 +98,10 @@ This keeps each step cheap while still letting the temperature decide whether a 
 
 \subsection{Tabu Search}
 Tabu Search (TS) extends classical local search by using memory structures to escape local minima and to avoid cycling \cite{gendreauTabuSearch2019}.
-While a plain local search like 2-Opt stops at the first local optimum, 
+While a plain local search like 2-Opt stops at the first local optimum,
 TS continues from there by accepting non-improving moves.
-To prevent the search from immediately undoing such a move and returning to the previous solution, 
-it keeps a \emph{tabu list} of recently performed moves. 
+To prevent the search from immediately undoing such a move and returning to the previous solution,
+it keeps a \emph{tabu list} of recently performed moves.
 Moves that are \emph{tabu} (forbidden) are not allowed unless they satisfy an \emph{aspiration criterion} (e.g., they lead to a new global best).
 
 In the algorithm implementation \ref{alg:tabu}, the search space is the set of all Hamiltonian tours.
@@ -121,27 +121,27 @@ Among all admissible moves, the one with the smallest tour length is selected (\
 		\STATE $s_{\text{best}} \gets s$
 		\STATE $\text{tabuList} \gets \text{empty queue}$
 		\FOR{$\text{iteration} = 1$ \TO $\text{maxIterations}$}
-			\STATE $\text{bestNeighbor} \gets \text{None}$
-			\STATE $\text{bestMove} \gets \text{None}$
-			\FOR{each $2$-Opt move $(i,j)$ in the current tour}
-				\STATE $s' \gets \text{tour after applying move }(i,j)$
-				\STATE $\text{isTabu} \gets (i,j) \in \text{tabuList}$
-				\IF{$\text{not isTabu}$ \OR $\text{Cost}(s') < \text{Cost}(s_{\text{best}})$}
-					\IF{$\text{Cost}(s') < \text{Cost}(\text{bestNeighbor})$}
-						\STATE $\text{bestNeighbor} \gets s'$
-						\STATE $\text{bestMove} \gets (i,j)$
-					\ENDIF
-				\ENDIF
-			\ENDFOR
-			\IF{$\text{bestNeighbor} = \text{None}$} \STATE \textbf{break} \ENDIF
-			\STATE $s \gets \text{bestNeighbor}$
-			\STATE add $\text{bestMove}$ to $\text{tabuList}$
-			\IF{$\text{len}(\text{tabuList}) > \text{tenure}$}
-				\STATE remove oldest entry
-			\ENDIF
-			\IF{$\text{Cost}(s) < \text{Cost}(s_{\text{best}})$}
-				\STATE $s_{\text{best}} \gets s$
-			\ENDIF
+		\STATE $\text{bestNeighbor} \gets \text{None}$
+		\STATE $\text{bestMove} \gets \text{None}$
+		\FOR{each $2$-Opt move $(i,j)$ in the current tour}
+		\STATE $s' \gets \text{tour after applying move }(i,j)$
+		\STATE $\text{isTabu} \gets (i,j) \in \text{tabuList}$
+		\IF{$\text{not isTabu}$ \OR $\text{Cost}(s') < \text{Cost}(s_{\text{best}})$}
+		\IF{$\text{Cost}(s') < \text{Cost}(\text{bestNeighbor})$}
+		\STATE $\text{bestNeighbor} \gets s'$
+		\STATE $\text{bestMove} \gets (i,j)$
+		\ENDIF
+		\ENDIF
+		\ENDFOR
+		\IF{$\text{bestNeighbor} = \text{None}$} \STATE \textbf{break} \ENDIF
+		\STATE $s \gets \text{bestNeighbor}$
+		\STATE add $\text{bestMove}$ to $\text{tabuList}$
+		\IF{$\text{len}(\text{tabuList}) > \text{tenure}$}
+		\STATE remove oldest entry
+		\ENDIF
+		\IF{$\text{Cost}(s) < \text{Cost}(s_{\text{best}})$}
+		\STATE $s_{\text{best}} \gets s$
+		\ENDIF
 		\ENDFOR
 		\RETURN $s_{\text{best}}$ with closing edge
 	\end{algorithmic}
@@ -150,8 +150,8 @@ Among all admissible moves, the one with the smallest tour length is selected (\
 The selected move is then applied to become the new current tour, and the move (represented as the pair $(i,j)$) is added to the tabu list.
 If the tabu list exceeds a given \emph{tabu tenure}, the oldest entry is removed.
 The tabu tenure is set to $\max(7, \lfloor\sqrt{n}\rfloor)$.
-This choice follows a common static rule depending on the problem size, where $\sqrt(n)$ 
-provides a balanced trade-off between intensification (not overly restricting the search) 
+This choice follows a common static rule depending on the problem size, where $\sqrt(n)$
+provides a balanced trade-off between intensification (not overly restricting the search)
 and diversification (preventing cycles) \cite{krishnakumarriyerTabuSearchAlgorithm2013}  \textcolor{red}{cited this, but it's behind a paywall}\cite{osmanMetastrategySimulatedAnnealing1993}
 
 The search continues for a fixed number of iterations, which depends on the problem size: \newline
@@ -164,10 +164,10 @@ The aspiration criterion used here is the simplest and most common one.
 A tabu move is allowed if it produces a tour strictly shorter than the global best tour found so far \cite[Sec. 2.3.5]{gendreauTabuSearch2019}.
 This guarantees that no improving move that would set a new record is ever rejected.
 The tabu list stores only the pair $(i,j)$ representing the inversion endpoints.
-This prevents the immediate reversal of that particular 2-Opt swap, 
+This prevents the immediate reversal of that particular 2-Opt swap,
 but does not forbid other moves that involve the same edges or cities, thus keeping the search sufficiently flexible.
 
-Compared to Simulated Annealing, Tabu Search uses a deterministic move selection rule (best admissible neighbor) 
+Compared to Simulated Annealing, Tabu Search uses a deterministic move selection rule (best admissible neighbor)
 and relies on explicit memory to avoid cycles rather than on probabilistic acceptance.
 For the TSP, TS often finds very good solutions in a moderate number of iterations,
 because its best-improvement strategy aggressively descends toward local optima,
@@ -180,11 +180,11 @@ The implementation follows the classic template described in \cite[Sec. 2.3.6]{g
 
 
 \subsection{Iterated Local Search}
-The idea of iterated local search is that instead of searching the whole space of all candidate solutions, 
+The idea of iterated local search is that instead of searching the whole space of all candidate solutions,
 we focus only on candidate solutions in the local neighborhood of an initial solution.
 These are usually generated by some kind of local search heuristic.
 It is conceptually simple, but has led to state-of-the-art algorithms for many problems \cite{lourencoIteratedLocalSearch2019}.
-In its essence, iterated local search builds a chain of solutions by exploring the currently best solutions local neighborhood 
+In its essence, iterated local search builds a chain of solutions by exploring the currently best solutions local neighborhood
 but introduces some randomness in order to not get stuck in local minima.
 
 \begin{algorithm}[H]
@@ -256,8 +256,8 @@ This hybrid initialization ensures that a good starting solution is always prese
 		\STATE $\text{greedy} \gets \text{GreedyInitialTour}()$ \COMMENT{without closing edge}
 		\STATE $\text{population.append}(\text{greedy})$
 		\WHILE{$\text{len}(\text{population}) < \text{popSize}$}
-			\STATE $\text{randomTour} \gets \text{random permutation of } \{0,\dots,n-1\}$
-			\STATE $\text{population.append}(\text{randomTour})$
+		\STATE $\text{randomTour} \gets \text{random permutation of } \{0,\dots,n-1\}$
+		\STATE $\text{population.append}(\text{randomTour})$
 		\ENDWHILE
 		\RETURN $\text{population}$
 	\end{algorithmic}
@@ -265,7 +265,7 @@ This hybrid initialization ensures that a good starting solution is always prese
 
 \subsubsection{Selection and Elitism}
 At each generation, the next population is built as follows.
-First, the \(\text{ELITISM\_COUNT} = 2\) best tours of the current population are copied unchanged into the new population (\emph{elitism}), 
+First, the \(\text{ELITISM\_COUNT} = 2\) best tours of the current population are copied unchanged into the new population (\emph{elitism}),
 guaranteeing that the best solution never degrades.
 The remaining slots are filled by repeatedly selecting two parents using \emph{tournament selection}:
 Pick \(\text{TOURNAMENT\_SIZE} = 5\) random individuals from the population and return the one with the shortest tour length.
@@ -288,9 +288,9 @@ Tournament selection applies selection pressure without requiring global sorting
 With probability \(\text{CROSSOVER\_RATE} = 0.9\), the two parents are recombined using \emph{Order Crossover (OX)}.
 OX works by:
 \begin{enumerate}
-    \item choosing two random cut points \(i < j\) in the parent permutation,
-    \item copying the segment between \(i\) and \(j\) from the first parent into the child at the same positions,
-    \item filling the remaining positions in the child with the cities from the second parent in the order they appear, skipping those already placed.
+	\item choosing two random cut points \(i < j\) in the parent permutation,
+	\item copying the segment between \(i\) and \(j\) from the first parent into the child at the same positions,
+	\item filling the remaining positions in the child with the cities from the second parent in the order they appear, skipping those already placed.
 \end{enumerate}
 
 \begin{algorithm}[H]
@@ -342,9 +342,9 @@ The algorithm returns the global best tour after the final generation.
 
 The genetic algorithm does not use any local improvement.
 It relies entirely on crossover and mutation to evolve good tours.
-Despite this, the combination of a greedy initial solution, elitism, 
+Despite this, the combination of a greedy initial solution, elitism,
 and the order crossover operator often yields competitive results, especially for smaller instances.
-For larger problems, the GA can be slower than local search methods, 
+For larger problems, the GA can be slower than local search methods,
 but it maintains a broad exploration of the search space.
 
 
@@ -355,26 +355,26 @@ but it maintains a broad exploration of the search space.
 		\STATE $\text{population} \gets \text{InitializePopulation}()$ \COMMENT{1 greedy + 99 random}
 		\STATE $s_{\text{best}} \gets \text{best tour in population}$
 		\FOR{$\text{generation} = 1$ \TO $\text{maxGenerations}$}
-			\STATE $\text{newPopulation} \gets \text{elite individuals from population}$
-			\WHILE{$\text{newPopulation not full}$}
-				\STATE $p_1 \gets \text{TournamentSelect}(\text{population})$
-				\STATE $p_2 \gets \text{TournamentSelect}(\text{population})$
-				\IF{random float $\in [0,1] < \text{crossoverRate}$}
-					\STATE $\text{child} \gets \text{OrderCrossover}(p_1, p_2)$
-				\ELSE
-					\STATE $\text{child} \gets p_1$
-				\ENDIF
-				\IF{random float $\in [0,1] < \text{mutationRate}$}
-					\STATE $\text{child} \gets \text{InversionMutate}(\text{child})$
-				\ENDIF
-				\STATE add $\text{child}$ to $\text{newPopulation}$
-			\ENDWHILE
-			\STATE $\text{population} \gets \text{newPopulation}$
-			\STATE $s_{\text{best}} \gets \min(s_{\text{best}},\; \text{best in population})$
+		\STATE $\text{newPopulation} \gets \text{elite individuals from population}$
+		\WHILE{$\text{newPopulation not full}$}
+		\STATE $p_1 \gets \text{TournamentSelect}(\text{population})$
+		\STATE $p_2 \gets \text{TournamentSelect}(\text{population})$
+		\IF{random float $\in [0,1] < \text{crossoverRate}$}
+		\STATE $\text{child} \gets \text{OrderCrossover}(p_1, p_2)$
+		\ELSE
+		\STATE $\text{child} \gets p_1$
+		\ENDIF
+		\IF{random float $\in [0,1] < \text{mutationRate}$}
+		\STATE $\text{child} \gets \text{InversionMutate}(\text{child})$
+		\ENDIF
+		\STATE add $\text{child}$ to $\text{newPopulation}$
+		\ENDWHILE
+		\STATE $\text{population} \gets \text{newPopulation}$
+		\STATE $s_{\text{best}} \gets \min(s_{\text{best}},\; \text{best in population})$
 		\ENDFOR
 		\RETURN $s_{\text{best}}$ with closing edge
 	\end{algorithmic}
 \end{algorithm}
 
-An advanced discussion of genetic algorithms for combinatorial optimization, 
+An advanced discussion of genetic algorithms for combinatorial optimization,
 including Gray-box optimization and the EAX crossover, is given in \cite{whitleyNextGenerationGenetic2019}.
