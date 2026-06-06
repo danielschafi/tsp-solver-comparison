@@ -359,12 +359,12 @@ but it maintains a broad exploration of the search space.
 			\WHILE{$\text{newPopulation not full}$}
 				\STATE $p_1 \gets \text{TournamentSelect}(\text{population})$
 				\STATE $p_2 \gets \text{TournamentSelect}(\text{population})$
-				\IF{random number $< \text{crossoverRate}$}
+				\IF{random float $\in [0,1] < \text{crossoverRate}$}
 					\STATE $\text{child} \gets \text{OrderCrossover}(p_1, p_2)$
 				\ELSE
 					\STATE $\text{child} \gets p_1$
 				\ENDIF
-				\IF{random number $< \text{mutationRate}$}
+				\IF{random float $\in [0,1] < \text{mutationRate}$}
 					\STATE $\text{child} \gets \text{InversionMutate}(\text{child})$
 				\ENDIF
 				\STATE add $\text{child}$ to $\text{newPopulation}$
