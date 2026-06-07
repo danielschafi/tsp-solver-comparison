@@ -7,10 +7,10 @@ The goal is to introduce the reader to a variety of different techniques and con
 2-Opt is one of the simplest and most widely used local search heuristics for the TSP \cite{regoLocalSearchMetaheuristics}.
 Starting from an initial tour, it repeatedly removes two non-adjacent edges and reconnects the resulting two paths in the only other possible way, which is the same as reversing the segment between the two cut points. The tour is cut into two segments \( A,B \), and then reconnected as \( A, reversed(B) \).
 A move is accepted whenever it strictly decreases the tour length.
-The neighborhood of a tour with \( n \) cities therefore contains \( \mathcal{O}(n^2) \) candidate moves.
+The neighbourhood of a tour with \( n \) cities therefore contains \( \mathcal{O}(n^2) \) candidate moves.
 The search terminates in a local minimum, that is, a tour for which no single 2-Opt swap gives an improvement.
 
-In this study, the initial tour is constructed by a greedy nearest-neighbor heuristic: starting from a fixed city, the next city is always chosen as the closest unvisited one until all cities are included.
+In this study, the initial tour is constructed by a greedy nearest-neighbour heuristic: starting from a fixed city, the next city is always chosen as the closest unvisited one until all cities are included.
 The 2-Opt search itself uses a \emph{first-improvement} strategy: as soon as an improving swap \( (i,j) \) is found, it is applied immediately and the scan is restarted from the beginning of the tour.
 This is repeated until a full pass over all pairs of edges \( (i,j) \) finds no improving move, at which point the tour is 2-optimal \cite{regoLocalSearchMetaheuristics}.
 
@@ -52,7 +52,7 @@ Plain local search like 2-Opt always stops at the first local minimum it reaches
 Simulated Annealing fixes this by sometimes accepting worse tours on purpose, so that the search can escape a local minimum and keep looking for a better solution \cite{Delahaye2019}.
 
 How willing the algorithm is to accept a worse tour is controlled by a single number called \textit{temperature} \( T \).
-At each step a neighbor tour is created with one random 2-Opt move, and the change in tour length \( \Delta = \text{Cost}(\text{next}) - \text{Cost}(\text{current}) \) is computed.
+At each step a neighbour tour is created with one random 2-Opt move, and the change in tour length \( \Delta = \text{Cost}(\text{next}) - \text{Cost}(\text{current}) \) is computed.
 A better tour (\( \Delta < 0 \)) is always accepted.
 A worse tour is accepted only with probability \( e^{-\Delta / T} \).
 When \( T \) is high this probability is close to one, so many worse tours are accepted. When \( T \) is low it is close to zero, so the algorithm behaves almost like normal 2-Opt local search.
@@ -60,7 +60,7 @@ The temperature is lowered after every step with a geometric cooling schedule, \
 
 To compare the algorithms in this study, the starting temperature \( T_0 \) is not fixed but estimated for each problem so that the algorithm fits the scale of the distances:
 a few hundred random 2-Opt moves are sampled, the average of the worsening moves \( \overline{\Delta} \) (mean delta) is taken, and \( T_0 \) is set so that about \( 60\% \) of such moves would be accepted at the start, i.e. \( T_0 = \overline{\Delta} / \ln(1 / 0.6) \).
-The search starts from a greedy nearest-neighbor tour and runs for a fixed budget of \( 100\,000 \) iterations (or stops early once the temperature is practically zero), always returning the best tour seen so far.
+The search starts from a greedy nearest-neighbour tour and runs for a fixed budget of \( 100\,000 \) iterations (or stops early once the temperature is practically zero), always returning the best tour seen so far.
 
 \begin{algorithm}[H]
 	\caption{Simulated Annealing}
@@ -106,11 +106,11 @@ it keeps a \textit{tabu list} of recently performed moves.
 Moves that are in the tabu list are not allowed unless they satisfy an \emph{aspiration criterion} (e.g., they lead to a new global best).
 
 In algorithm \ref{alg:tabu}, the search space is the set of all Hamiltonian tours.
-The neighborhood is defined by all 2-Opt swaps, giving $\mathcal{O}(n^2)$ candidate moves per iteration.
-The initial solution is constructed by the same greedy nearest-neighbor heuristic used for 2-Opt and Simulated Annealing.
+The neighbourhood is defined by all 2-Opt swaps, giving $\mathcal{O}(n^2)$ candidate moves per iteration.
+The initial solution is constructed by the same greedy nearest-neighbour heuristic used for 2-Opt and Simulated Annealing.
 
-At each iteration, the algorithm examines the whole 2-Opt neighborhood of the current tour.
-For every pair $(i,j)$, it generates a neighbor by reversing the segment $i+1 \ldots j$ and computes its total length.
+At each iteration, the algorithm examines the whole 2-Opt neighbourhood of the current tour.
+For every pair $(i,j)$, it generates a neighbour by reversing the segment $i+1 \ldots j$ and computes its total length.
 A move is considered admissible if either it is not tabu, or its tour length is better than the best known solution (aspiration criterion).
 Among all admissible moves, the one with the smallest tour length is selected (\emph{best improvement} strategy).
 
@@ -121,7 +121,7 @@ The general steps for tabu search are:
 \begin{enumerate}
 	\item Construct initial solution $s_0$
 	\item While termination criterion not satisfied: \begin{enumerate}
-		      \item Find the tour \( s \) that minimizes the \( Cost(s) \) from the current neighborhood that is either non-tabu or allowed by the aspiration criterion (e.g. all possible 2-Opt moves)
+		      \item Find the tour \( s \) that minimises the \( Cost(s) \) from the current neighbourhood that is either non-tabu or allowed by the aspiration criterion (e.g. all possible 2-Opt moves)
 		      \item If that tour \( S \) is better than the current best \( Cost(s) < Cost(s_{best}) \) it becomes the new best tour.
 		      \item Add the current move to the tabu list, replace oldest entry if it is full.
 	      \end{enumerate}
@@ -137,20 +137,20 @@ And how this is specifically implemented can be found in algorithm \ref{alg:tabu
 		\STATE $s_{\text{best}} \gets s$
 		\STATE $\text{tabuList} \gets \text{empty queue}$
 		\FOR{$\text{iteration} = 1$ \TO $\text{maxIterations}$}
-		\STATE $\text{bestNeighbor} \gets \text{None}$
+		\STATE $\text{bestNeighbour} \gets \text{None}$
 		\STATE $\text{bestMove} \gets \text{None}$
 		\FOR{each possible $2$-Opt move $(i,j)$ on \( s \) }
 		\STATE $s' \gets \text{tour after applying move }(i,j)$
 		\STATE $\text{isTabu} \gets (i,j) \in \text{tabuList}$
 		\IF{$\text{not isTabu}$ \OR $\text{Cost}(s') < \text{Cost}(s_{\text{best}})$}
-		\IF{$\text{Cost}(s') < \text{Cost}(\text{bestNeighbor})$}
-		\STATE $\text{bestNeighbor} \gets s'$
+		\IF{$\text{Cost}(s') < \text{Cost}(\text{bestNeighbour})$}
+		\STATE $\text{bestNeighbour} \gets s'$
 		\STATE $\text{bestMove} \gets (i,j)$
 		\ENDIF
 		\ENDIF
 		\ENDFOR
-		\IF{$\text{bestNeighbor} = \text{None}$} \STATE \textbf{break} \ENDIF
-		\STATE $s \gets \text{bestNeighbor}$
+		\IF{$\text{bestNeighbour} = \text{None}$} \STATE \textbf{break} \ENDIF
+		\STATE $s \gets \text{bestNeighbour}$
 		\STATE add $\text{bestMove}$ to $\text{tabuList}$
 		\IF{$\text{len}(\text{tabuList}) > \text{tenure}$}
 		\STATE remove oldest entry
@@ -165,12 +165,12 @@ And how this is specifically implemented can be found in algorithm \ref{alg:tabu
 For our comparison, the tabu tenure is set to $\max(7, \lfloor\sqrt{n}\rfloor)$.
 This choice is based upon commonly used tabu tenure values \( 7, \sqrt{n},n \) \cite{krishnakumarriyerTabuSearchAlgorithm2013, osmanMetastrategySimulatedAnnealing1993}.
 
-The search continues for a fixed number of iterations, which depends on the problem size: $\text{maxIterations} = \max(50,\, 5000 / n)$
+The search continues for a fixed number of iterations, which depends on the problem size: $\text{maxIterations} = \max(50,\, 5\,000 / n)$
 
 This scaling ensures that large instances are not overwhelmed by an excessive number of iterations, while small instances still receive enough exploration.
 The algorithm returns the best tour found over the whole search.
 
-Compared to Simulated Annealing, Tabu Search uses a deterministic move selection rule (best admissible neighbor)
+Compared to Simulated Annealing, Tabu Search uses a deterministic move selection rule (best admissible neighbour)
 and relies on explicit memory to avoid cycles rather than on probabilistic acceptance.
 For the TSP, TS often finds very good solutions in a moderate number of iterations,
 because its best-improvement strategy aggressively descends toward local optima,
@@ -184,10 +184,10 @@ The implementation follows the classic template described in \cite{burkeSearchMe
 
 \subsection{Iterated Local Search}
 The idea of iterated local search is that instead of searching the whole space of all candidate solutions,
-we focus only on candidate solutions in the local neighborhood of an initial solution.
+we focus only on candidate solutions in the local neighbourhood of an initial solution.
 These are usually generated by some kind of local search heuristic.
 It is conceptually simple, but has led to state-of-the-art algorithms for many problems \cite{lourencoIteratedLocalSearch2019}.
-In its essence, iterated local search builds a chain of solutions by exploring the currently best solutions local neighborhood
+In its essence, iterated local search builds a chain of solutions by exploring the currently best solutions local neighbourhood
 but introduces some randomness in order to not get stuck in local minima.
 
 \begin{algorithm}[H]
@@ -210,18 +210,18 @@ but introduces some randomness in order to not get stuck in local minima.
 		\RETURN $s_{\text{best}}$
 	\end{algorithmic}
 \end{algorithm}
-Iterated local search can be used with any heuristic optimization algorithm (\textit{LocalSearch}) that takes in a tour and returns one that is at least as good as the input.
+Iterated local search can be used with any heuristic optimisation algorithm (\textit{LocalSearch}) that takes in a tour and returns one that is at least as good as the input.
 It starts from some kind of initial solution \( s_{0} \) that is improved to \( s^* \) by one iteration of the \textit{LocalSearch} algorithm. This is the current solution.
 Then we try to improve \( s^* \) for a number of iterations or until a termination condition is met.
 
-For the algorithm to be able to escape the local neighborhood, instead of applying \textit{LocalSearch} directly to the current solution \( s^* \) again,
+For the algorithm to be able to escape the local neighbourhood, instead of applying \textit{LocalSearch} directly to the current solution \( s^* \) again,
 first a change or \textit{Perturbation} is applied that leads to an intermediate solution \( s' \).
 Then \textit{LocalSearch} is applied to \( s' \) and we get a new candidate solution \( s^*\prime ' \).
 If this candidate solution \( s^*\prime ' \) has a better \textit{Cost} than the current one, it becomes the new current solution \( s^*\prime \).
 If it is better than the current best, it also becomes the new current best \( s_{best} \).
 
 
-The \textit{Cost} is the function that is to be minimized by the algorithm.
+The \textit{Cost} is the function that is to be minimised by the algorithm.
 In the case of the TSP that is the length of the tour.
 
 The \textit{Perturbation} is the mechanism that allows the algorithm to escape local minima. This function should not be reversible by the \textit{LocalSearch}.
@@ -243,7 +243,7 @@ A population of candidate tours evolves over several generations using selection
 The algorithm aims to maintain a diverse set of solutions, which helps to explore the search space more efficiently compared to local search alone.
 Our chosen version follows this form:
 \begin{enumerate}
-	\item Initialize population
+	\item Initialise population
 	\item Then repeat for a number of generations: \begin{enumerate}
 		      \item Copy the top performing individuals (tours) into the next generation unchanged (elitism).
 		      \item Fill the remaining slots in the new generation by selecting two parents with tournament selection and then mutate them (firs order crossover, then inversion mutation).
@@ -251,17 +251,17 @@ Our chosen version follows this form:
 	      \end{enumerate}
 	\item Return best tour found.
 \end{enumerate}
-Following the setup and different components of the genetic algorithm (initialization, selection, mutation, recombination) are explained.
+Following the setup and different components of the genetic algorithm (initialisation, selection, mutation, recombination) are explained.
 
-\subsubsection{Representation and Initialization}
+\subsubsection{Representation and Initialisation}
 Each tour is represented as a permutation of the \(n\) city indices (without the closing edge).
 The initial population consists of a number of individuals (here set to 100).
-One individual is created by the same greedy nearest-neighbor heuristic used for the other algorithms.
+One individual is created by the same greedy nearest-neighbour heuristic used for the other algorithms.
 The remaining 99 individuals are random permutations of the \( n \) cities.
-This hybrid initialization ensures that a good starting solution is always present while providing diversity.
+This hybrid initialisation ensures that a good starting solution is always present while providing diversity.
 
 \begin{algorithm}[H]
-	\caption{Genetic: Initialization of the Population}
+	\caption{Genetic: Initialisation of the Population}
 	\label{alg:ga-init}
 	\begin{algorithmic}[1]
 		\STATE $n \gets \text{number of cities}$
@@ -367,7 +367,7 @@ but it maintains a broad exploration of the search space.
 	\caption{Genetic Algorithm}
 	\label{alg:ga}
 	\begin{algorithmic}[1]
-		\STATE $\text{population} \gets \text{InitializePopulation}()$ \COMMENT{1 greedy + 99 random}
+		\STATE $\text{population} \gets \text{InitialisePopulation}()$ \COMMENT{1 greedy + 99 random}
 		\STATE $s_{\text{best}} \gets \text{best tour in population}$
 		\FOR{$\text{generation} = 1$ \TO $\text{maxGenerations}$}
 		\STATE $\text{newPopulation} \gets \text{elite individuals from population}$
@@ -391,4 +391,4 @@ but it maintains a broad exploration of the search space.
 	\end{algorithmic}
 \end{algorithm}
 
-An advanced discussion of genetic algorithms for combinatorial optimization is given in \cite{whitleyNextGenerationGenetic2019}.
+An advanced discussion of genetic algorithms for combinatorial optimisation is given in \cite{whitleyNextGenerationGenetic2019}.
