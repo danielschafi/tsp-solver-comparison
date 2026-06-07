@@ -18,6 +18,10 @@ For each problem instance
 \paragraph{Benchmark Ground Truths}
 The optimal tours for the benchmark instances were obtained using the Concorde TSP solver. After computing the optimal tour, the tour length was recorded for later comparison.
 
+\paragraph{Baselines}
+In addition to the above described algorithms and the ground truth computed by Concorde, we also provide a greedy nearest neighbor baseline for comparison.
+This is the most simple way to build a tour. Starting from some city, the next city to be visited is always the one that is closest to it, this is repeated until all cities have been visited.
+
 
 \paragraph{Hardware \& Environment}
 All experiments were conducted on a machine with a 32-core (64-thread) Intel Xeon Gold 6326 CPU, 504 GB of RAM.
