@@ -29,7 +29,7 @@ All experiments were conducted on a machine with a 32-core (64-thread) Intel Xeo
 
 
 \section{Results}\label{sec:results}
-In this chapter we present the results of the discussed algorithms in addition to the greedy baseline and Concorde on the benchmark instances. It should be said though, that Concorde is written in C and because of that runs way faster than the other algorithms, which have been implemented in python.
+In this chapter we present the results of the discussed algorithms in addition to the greedy baseline and Concorde on the benchmark instances.
 Figure \ref{fig:optimality_gap_lines_uniform} shows  the optimality gap on the uniform instances along with the standard deviation across the 30 instances per size, figure \ref{fig:optimality_gap_lines_clustered}.
 In general, the gap is higher on the clustered instances, than on the uniform sampled instances across all algorithms. However, this is mostly visible on the smaller sized instances with less than 500 nodes and their respective gaps converge on larger instances.
 One exception to that is simulated annealing, that performs worse on the uniform instances than on the clustered ones for size 200.

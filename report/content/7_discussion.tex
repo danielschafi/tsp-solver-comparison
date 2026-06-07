@@ -1,8 +1,27 @@
 \section{Discussion}
 
+
 Trade off analysis. Speed vs Quality.
 
 Best all rounder, fast but sloppy, accurate but expensive...
 
 Explain why the results look like that.
 Why is one algorithm better able to handle clusters than another. etc.
+
+
+
+Although the algorithms used to solve the benchmark problems were able to do so even for the largest instances, the time required to do so is really outside the bounds of practicality (ca. 27 hours for tabu search on clustered instances). Keep in mind though, that these are very basic version of these algorithms, and many extensions and more advanced versions exist.
+
+\subsection{Limitations}
+This study compares a small selection of existing algorithms available to solve the TSP, there are other approaches that solve it in a different way, however this selection of algorithm should give the reader a good overview of concepts and techniques to handle the NP-hard nature of this problem.
+
+Most of these algorithms have some hyperparameters that could be tuned to achieve better results, potentially making this comparison unfair. The chosen values are sensible defaults but could be improved.
+
+The performance of the algorithms is almost identical between uniform and clustered instances.
+This is unexpected because it is expected that some of the algorithms would be able to exploit the structure of these clusters to find better solutions faster, since solving a TSP with two distinct clusters essentially reduces to solving two separate smaller TSPs, reducing the overall problem size significantly.
+It is suspected that the generation of the clustered instances is possibly suboptimal.
+Since the number of clusters is set to \( \max(1, n  // 10) \), there will be 10 nodes per cluster. This cluster size might be to small or the number of clusters to big for algorithms to effectively exploit these subgraph structures.
+Therefore the sampling  approach for the clustered instances should be revised to produce more realistic graphs. Further experiments need to be done, but fall outside the scope of this study due to computation time constraints.
+
+
+
