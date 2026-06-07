@@ -56,4 +56,7 @@ D.~Delahaye, S.~Chaimatanan, and M.~Mongeau, ``Simulated annealing: {{From}} bas
 \bibitem{osmanMetastrategySimulatedAnnealing1993}
 I.~H. Osman, ``Metastrategy simulated annealing and tabu search algorithms for the vehicle routing problem,'' \emph{Annals of Operations Research}, vol.~41, no.~4, pp. 421--451, Dec. 1993.
 
+\bibitem{burkeSearchMethodologiesIntroductory2014}
+E.~K. Burke and G.~Kendall, Eds., \emph{Search {{Methodologies}}: {{Introductory Tutorials}} in {{Optimization}} and {{Decision Support Techniques}}}.\hskip 1em plus 0.5em minus 0.4em\relax Boston, MA: Springer US, 2014.
+
 \end{thebibliography}

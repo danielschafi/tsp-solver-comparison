@@ -98,14 +98,14 @@ This keeps each step cheap while still letting the temperature decide whether a 
 
 
 \subsection{Tabu Search}
-Tabu Search (TS) extends classical local search by using memory structures to escape local minima and to avoid cycling \cite{gendreauTabuSearch2019}.
-While a plain local search like 2-Opt stops at the first local optimum,
-TS continues from there by accepting non-improving moves.
-To prevent the search from immediately undoing such a move and returning to the previous solution,
-it keeps a \emph{tabu list} of recently performed moves.
-Moves that are \emph{tabu} (forbidden) are not allowed unless they satisfy an \emph{aspiration criterion} (e.g., they lead to a new global best).
 
-In the algorithm implementation \ref{alg:tabu}, the search space is the set of all Hamiltonian tours.
+Tabu Search (TS) allows local search methods to overcome local optima.
+It does this by using a local search method (like 2-opt), but when it encounters a local minimum and can't find an improving move, it allows non-improving moves to escape it.
+To prevent the search from immediately undoing such a move and returning to the previous solution,
+it keeps a \textit{tabu list} of recently performed moves.
+Moves that are in the tabu list are not allowed unless they satisfy an \emph{aspiration criterion} (e.g., they lead to a new global best).
+
+In algorithm \ref{alg:tabu}, the search space is the set of all Hamiltonian tours.
 The neighborhood is defined by all 2-Opt swaps, giving $\mathcal{O}(n^2)$ candidate moves per iteration.
 The initial solution is constructed by the same greedy nearest-neighbor heuristic used for 2-Opt and Simulated Annealing.
 
@@ -114,17 +114,32 @@ For every pair $(i,j)$, it generates a neighbor by reversing the segment $i+1 \l
 A move is considered admissible if either it is not tabu, or its tour length is better than the best known solution (aspiration criterion).
 Among all admissible moves, the one with the smallest tour length is selected (\emph{best improvement} strategy).
 
+The selected move is then applied to become the new current tour, and the move (represented as the pair $(i,j)$) is added to the tabu list.
+If the tabu list exceeds a given length, the \emph{tabu tenure}, the oldest entry is removed.
+
+The general steps for tabu search are:
+\begin{enumerate}
+	\item Construct initial solution $s_0$
+	\item While termination criterion not satisfied: \begin{enumerate}
+		      \item Find the tour \( s \) that minimizes the \( Cost(s) \) from the current neighborhood that is either non-tabu or allowed by the aspiration criterion (e.g. all possible 2-Opt moves)
+		      \item If that tour \( S \) is better than the current best \( Cost(s) < Cost(s_{best}) \) it becomes the new best tour.
+		      \item Add the current move to the tabu list, replace oldest entry if it is full.
+	      \end{enumerate}
+	\item Return \( s_{best} \)
+\end{enumerate}
+And how this is specifically implemented can be found in algorithm \ref{alg:tabu}
+
 \begin{algorithm}[H]
 	\caption{Tabu Search}
 	\label{alg:tabu}
 	\begin{algorithmic}[1]
-		\STATE $s \gets \text{GreedyInitialTour}()$ \COMMENT{without closing edge}
+		\STATE $s \gets \text{GreedyInitialTour}()$
 		\STATE $s_{\text{best}} \gets s$
 		\STATE $\text{tabuList} \gets \text{empty queue}$
 		\FOR{$\text{iteration} = 1$ \TO $\text{maxIterations}$}
 		\STATE $\text{bestNeighbor} \gets \text{None}$
 		\STATE $\text{bestMove} \gets \text{None}$
-		\FOR{each $2$-Opt move $(i,j)$ in the current tour}
+		\FOR{each possible $2$-Opt move $(i,j)$ on \( s \) }
 		\STATE $s' \gets \text{tour after applying move }(i,j)$
 		\STATE $\text{isTabu} \gets (i,j) \in \text{tabuList}$
 		\IF{$\text{not isTabu}$ \OR $\text{Cost}(s') < \text{Cost}(s_{\text{best}})$}
@@ -147,13 +162,8 @@ Among all admissible moves, the one with the smallest tour length is selected (\
 		\RETURN $s_{\text{best}}$ with closing edge
 	\end{algorithmic}
 \end{algorithm}
-
-The selected move is then applied to become the new current tour, and the move (represented as the pair $(i,j)$) is added to the tabu list.
-If the tabu list exceeds a given \emph{tabu tenure}, the oldest entry is removed.
-The tabu tenure is set to $\max(7, \lfloor\sqrt{n}\rfloor)$.
-This choice follows a common static rule depending on the problem size, where $\sqrt(n)$
-provides a balanced trade-off between intensification (not overly restricting the search)
-and diversification (preventing cycles) \cite{krishnakumarriyerTabuSearchAlgorithm2013}  \textcolor{red}{cited this, but it's behind a paywall}\cite{osmanMetastrategySimulatedAnnealing1993}
+For our comparison, the tabu tenure is set to $\max(7, \lfloor\sqrt{n}\rfloor)$.
+This choice is based upon commonly used tabu tenure values \( 7, \sqrt{n},n \) \cite{krishnakumarriyerTabuSearchAlgorithm2013, osmanMetastrategySimulatedAnnealing1993}-
 
 The search continues for a fixed number of iterations, which depends on the problem size: \newline
 $\text{MAX\_ITERATIONS} = \max(50,\, 5000 / n)$
@@ -161,19 +171,12 @@ $\text{MAX\_ITERATIONS} = \max(50,\, 5000 / n)$
 This scaling ensures that large instances are not overwhelmed by an excessive number of iterations, while small instances still receive enough exploration.
 The algorithm returns the best tour found over the whole search.
 
-The aspiration criterion used here is the simplest and most common one.
-A tabu move is allowed if it produces a tour strictly shorter than the global best tour found so far \cite[Sec. 2.3.5]{gendreauTabuSearch2019}.
-This guarantees that no improving move that would set a new record is ever rejected.
-The tabu list stores only the pair $(i,j)$ representing the inversion endpoints.
-This prevents the immediate reversal of that particular 2-Opt swap,
-but does not forbid other moves that involve the same edges or cities, thus keeping the search sufficiently flexible.
-
 Compared to Simulated Annealing, Tabu Search uses a deterministic move selection rule (best admissible neighbor)
 and relies on explicit memory to avoid cycles rather than on probabilistic acceptance.
 For the TSP, TS often finds very good solutions in a moderate number of iterations,
 because its best-improvement strategy aggressively descends toward local optima,
 while the tabu list provides just enough diversification to escape them.
-The implementation follows the classic template described in \cite[Sec. 2.3.6]{gendreauTabuSearch2019}.
+The implementation follows the classic template described in \cite{burkeSearchMethodologiesIntroductory2014}
 
 
 
