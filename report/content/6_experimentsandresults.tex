@@ -35,7 +35,7 @@ In general, the gap is higher on the clustered instances, than on the uniform sa
 One exception to that is simulated annealing, that performs worse on the uniform instances than on the clustered ones for size 200.
 Another one is tabu search on size 100 that also performs worse on the uniform instances.
 
-\begin{figure}[H]
+\begin{figure}
 	\begin{center}
 		\includegraphics[width=0.95\linewidth]{figures/optimality_gap_lines_uniform.png}
 	\end{center}
@@ -47,23 +47,29 @@ Consistently the worst one is the greedy algorithm, although performance is pret
 
 Interestingly, for most of the algorithms the gap is improving again after size 500, it plateaus there and then improves again.
 
-\begin{figure}[H]
+\begin{figure}
 	\begin{center}
 		\includegraphics[width=0.95\linewidth]{figures/optimality_gap_lines_clustered.png}
 	\end{center}
 	\caption{Optimality gap of clustered algorithms for different sizes and distributions}\label{fig:optimality_gap_lines_clustered}
 \end{figure}
 
-When looking at the time scaling
+When looking at the time scaling in figures \ref{fig:time_scaling_uniformed} , \ref{fig:time_scaling_clustered},  it looks very similar between uniform and clustered instances again. There is a small difference between them for Concorde at 200 nodes and for tabu search at size 2000.
 
-\begin{figure}[H]
+Greedy is the fastest by a big margin, followed by 2-opt for up to size 1000 before simulated annealing runs faster than it.
+After 2-opt follows the exact Concorde solver for most of the sizes, it is not directly comparable though because it was written in C instead of python.
+Afterwards iterated local search, tabu search, genetic algorithm and simulated annealing follow relatively close to each other, but they switch order after size 100.
+
+Overall, although it also requires the most time for small instances, simulated annealing exhibits the best scaling behaviour, even running faster than Concorde and 2-opt for large instances.
+
+\begin{figure}
 	\begin{center}
 		\includegraphics[width=0.95\linewidth]{figures/time_scaling_uniform.png}
 	\end{center}
 	\caption{Time scaling of uniformed algorithms for different sizes and distributions.}\label{fig:time_scaling_uniformed}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}
 	\begin{center}
 		\includegraphics[width=0.95\linewidth]{figures/time_scaling_clustered.png}
 	\end{center}
