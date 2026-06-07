@@ -240,13 +240,24 @@ this is a good choice because a 4-Opt move cannot be undone by a 2-Opt move and 
 \subsection{Genetic Algorithm}\label{subsec:genetic}
 Genetic Algorithms (GAs) are population-based metaheuristics inspired by natural evolution \cite{whitleyNextGenerationGenetic2019}.
 A population of candidate tours evolves over several generations using selection, crossover, and mutation.
-The algorithm maintains a diverse set of solutions, which helps to explore the search space more broadly than local search alone.
+The algorithm aims to maintain a diverse set of solutions, which helps to explore the search space more efficiently compared to local search alone.
+Our chosen version follows this form:
+\begin{enumerate}
+	\item Initialize population
+	\item Then repeat for a number of generations: \begin{enumerate}
+		      \item Copy the top performing individuals (tours) into the next generation unchanged (elitism).
+		      \item Fill the remaining slots in the new generation by selecting two parents with tournament selection and then mutate them (firs order crossover, then inversion mutation).
+		      \item Track the best tour across all generations.
+	      \end{enumerate}
+	\item Return best tour found.
+\end{enumerate}
+Following the setup and different components of the genetic algorithm (initialization, selection, mutation, recombination) are explained.
 
 \subsubsection{Representation and Initialization}
 Each tour is represented as a permutation of the \(n\) city indices (without the closing edge).
-The initial population consists of \( \text{POPULATION\_SIZE} = 100 \) individuals.
+The initial population consists of a number of individuals (here set to 100).
 One individual is created by the same greedy nearest-neighbor heuristic used for the other algorithms.
-The remaining 99 individuals are random permutations of the cities.
+The remaining 99 individuals are random permutations of the \( n \) cities.
 This hybrid initialization ensures that a good starting solution is always present while providing diversity.
 
 \begin{algorithm}[H]
@@ -256,7 +267,7 @@ This hybrid initialization ensures that a good starting solution is always prese
 		\STATE $n \gets \text{number of cities}$
 		\STATE $\text{popSize} \gets 100$
 		\STATE $\text{population} \gets \text{empty list}$
-		\STATE $\text{greedy} \gets \text{GreedyInitialTour}()$ \COMMENT{without closing edge}
+		\STATE $\text{greedy} \gets \text{GreedyInitialTour}()$
 		\STATE $\text{population.append}(\text{greedy})$
 		\WHILE{$\text{len}(\text{population}) < \text{popSize}$}
 		\STATE $\text{randomTour} \gets \text{random permutation of } \{0,\dots,n-1\}$
@@ -267,28 +278,30 @@ This hybrid initialization ensures that a good starting solution is always prese
 \end{algorithm}
 
 \subsubsection{Selection and Elitism}
-At each generation, the next population is built as follows.
-First, the \(\text{ELITISM\_COUNT} = 2\) best tours of the current population are copied unchanged into the new population (\emph{elitism}),
-guaranteeing that the best solution never degrades.
-The remaining slots are filled by repeatedly selecting two parents using \emph{tournament selection}:
-Pick \(\text{TOURNAMENT\_SIZE} = 5\) random individuals from the population and return the one with the shortest tour length.
-This is done twice to obtain two parents.
-Tournament selection applies selection pressure without requiring global sorting.
+In the selection phase it is determined which parents are allowed to produce offspring.
 
-\begin{algorithm}[H]
-	\caption{Genetic: Tournament Selection}
-	\label{alg:ga-select}
-	\begin{algorithmic}[1]
-		\REQUIRE population, costs, tournamentSize
-		\STATE $\text{indices} \gets \text{random choice of tournamentSize}$ \\
-		\STATE $\hspace{10em} \mbox{\textcolor{red}{$\hookrightarrow$}} \text{indices from population}$
-		\STATE $\text{bestIdx} \gets \text{index in indices with minimum cost}$
-		\RETURN $\text{population}[\text{bestIdx}]$
-	\end{algorithmic}
-\end{algorithm}
+At each generation the next generation is built as follows.
+A small number of the best performing tours are copied unchanged to the next generation (here 2). These are the elites, this guarantees that the best solution never degrades.
+
+The remaining \( populationSize - elitismCount \) slots are filled by first selecting two parents through tournament selection and then applying mutation to them in the next step.
+
+During tournament selection, a parent is picked by randomly drawing a number of individuals (here 5) and then choosing the best performing one from them.
+
+
+%\begin{algorithm}[H]
+%	\caption{Genetic: Tournament Selection}
+%	\label{alg:ga-select}
+%	\begin{algorithmic}[1]
+%		\REQUIRE population, costs, tournamentSize
+%		\STATE $\text{indices} \gets \text{random choice of tournamentSize}$ \\
+%		\STATE $\hspace{10em} \mbox{\textcolor{red}{$\hookrightarrow$}} \text{indices from population}$
+%		\STATE $\text{bestIdx} \gets \text{index in indices with minimum cost}$
+%		\RETURN $\text{population}[\text{bestIdx}]$
+%	\end{algorithmic}
+%\end{algorithm}
 
 \subsubsection{Crossover and Mutation}
-With probability \(\text{CROSSOVER\_RATE} = 0.9\), the two parents are recombined using \emph{Order Crossover (OX)}.
+With a order crossover probability (here 0.9), the two parents are recombined using \emph{Order Crossover (OX)}.
 OX works by:
 \begin{enumerate}
 	\item choosing two random cut points \(i < j\) in the parent permutation,
@@ -296,7 +309,7 @@ OX works by:
 	\item filling the remaining positions in the child with the cities from the second parent in the order they appear, skipping those already placed.
 \end{enumerate}
 
-\begin{algorithm}[H]
+\begin{algorithm}
 	\caption{Genetic: Order Crossover (OX)}
 	\label{alg:ga-ox}
 	\begin{algorithmic}[1]
@@ -318,9 +331,8 @@ OX works by:
 This operator preserves the relative order of cities from both parents and produces a valid tour.
 If crossover is not applied (with probability \(0.1\)), the child is an exact copy of the first parent.
 
-After crossover, each child is mutated with probability \(\text{MUTATION\_RATE} = 1/n\).
+After crossover, each child is mutated with probability \(1/n\).
 The mutation operator is \emph{inversion}: Two random positions \(i < j\) are chosen, and the segment between them is reversed.
-Inversion is a common mutation for permutation representations because it preserves the set of edges (i.e., does not introduce duplicate cities).
 
 \subsubsection{Generations and Termination}
 The number of generations is set to \(\max(100,\, 10 \cdot n)\), where \(n\) is the number of cities.
@@ -329,7 +341,7 @@ After each generation, the best tour in the new population is compared with the 
 The global best is updated if an improvement is found.
 
 The algorithm returns the global best tour after the final generation.
-\begin{algorithm}[H]
+\begin{algorithm}
 	\caption{Genetic: Inversion Mutation}
 	\label{alg:ga-mutate}
 	\begin{algorithmic}[1]
@@ -379,5 +391,4 @@ but it maintains a broad exploration of the search space.
 	\end{algorithmic}
 \end{algorithm}
 
-An advanced discussion of genetic algorithms for combinatorial optimization,
-including Gray-box optimization and the EAX crossover, is given in \cite{whitleyNextGenerationGenetic2019}.
+An advanced discussion of genetic algorithms for combinatorial optimization is given in \cite{whitleyNextGenerationGenetic2019}.
