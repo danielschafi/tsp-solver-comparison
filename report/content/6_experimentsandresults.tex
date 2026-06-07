@@ -29,16 +29,29 @@ All experiments were conducted on a machine with a 32-core (64-thread) Intel Xeo
 
 
 \section{Results}\label{sec:results}
-\subsubsection{Benchmark}
-Mention greedy baseline
+In this chapter we present the results of the discussed algorithms in addition to the greedy baseline and Concorde on the benchmark instances.
+Figure \ref{fig:optimality_gap_lines_uniform} shows  the optimality gap on the uniform instances along with the standard deviation across the 30 instances per size, figure \ref{fig:optimality_gap_lines_clustered}.
+In general, the gap is higher on the clustered instances, than on the uniform sampled instances across all algorithms. However, this is mostly visible on the smaller sized instances with less than 500 nodes and their respective gaps converge on larger instances.
+One exception to that is simulated annealing, that performs worse on the uniform instances than on the clustered ones for size 200.
+Another one is tabu search on size 100 that also performs worse on the uniform instances.
 
-\subsubsection{Hardware / Environment}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.95\linewidth]{figures/optimality_gap_lines_uniform.png}
+	\end{center}
+	\caption{Optimality gap of uniformed algorithms for different sizes and distributions}\label{fig:optimality_gap_lines_uniform}
+\end{figure}
+Iterated local search consistently performs the best across all sizes and distributions, followed by tabu search and 2-opt, where tabu search dominates for instances smaller than 500 but drops in performance on instances bigger than that.
+They are followed with a big margin by simulated annealing and the genetic algorithm, where simulated annealing wins until size 200 but looses starting from size 500.
+Consistently the worst one is the greedy algorithm, although performance is pretty much the same as simulated annealing starting from size 500.
+
+Interestingly, for most of the algorithms the gap is improving again after size 500, it plateaus there and then improves again.
 
 
-\begin{itemize}
-	\item Performance Metrics
-	\item Plots
-\end{itemize}
+
+
+
+
 
 \begin{figure}[H]
 	\begin{center}
@@ -47,12 +60,6 @@ Mention greedy baseline
 	\caption{Optimality gap of clustered algorithms for different sizes and distributions}\label{fig:optimality_gap_lines_clustered}
 \end{figure}
 
-\begin{figure}[H]
-	\begin{center}
-		\includegraphics[width=0.95\linewidth]{figures/optimality_gap_lines_uniform.png}
-	\end{center}
-	\caption{Optimality gap of uniformed algorithms for different sizes and distributions}\label{fig:optimality_gap_lines_uniform}
-\end{figure}
 
 
 % \begin{figure}[H]
