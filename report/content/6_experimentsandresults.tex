@@ -58,7 +58,7 @@ When looking at the time scaling in figures \ref{fig:time_scaling_uniformed} , \
 
 Greedy is the fastest by a big margin, followed by 2-opt for up to size 1000 before simulated annealing runs faster than it.
 After 2-opt follows the exact Concorde solver for most of the sizes, it is not directly comparable though because it was written in C instead of python.
-Afterwards iterated local search, tabu search, genetic algorithm and simulated annealing follow relatively close to each other, but they switch order after size 100.
+Afterwards iterated local search, tabu search, genetic algorithm and simulated annealing follow relatively close to each other, some of them switching order after 100 nodes.
 
 Overall, although it also requires the most time for small instances, simulated annealing exhibits the best scaling behaviour, even running faster than Concorde and 2-opt for large instances.
 

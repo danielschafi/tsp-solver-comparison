@@ -1,16 +1,21 @@
 \section{Discussion}
 
 
-Trade off analysis. Speed vs Quality.
-
-Best all rounder, fast but sloppy, accurate but expensive...
-
-Explain why the results look like that.
-Why is one algorithm better able to handle clusters than another. etc.
 
 
+\subsection{Benchmark}
 
 Although the algorithms used to solve the benchmark problems were able to do so even for the largest instances, the time required to do so is really outside the bounds of practicality (ca. 27 hours for tabu search on clustered instances). Keep in mind though, that these are very basic version of these algorithms, and many extensions and more advanced versions exist.
+
+The 2-opt algorithm is the probably the best all rounder, getting results always within 10\% of the optimum while maintaining good solve times compared to the others.
+
+Iterated local search delivers the smallest gap across all sizes but pays for that with solving time. Nevertheless this shows that its way of exploring the solution space provides an effective way to move from a local minimum to more globally optimal ones.
+
+It can be observed that for this problem, more runtime does not necessarily equal better performance. This showcases that through intelligent algorithm design, algorithms can be devised that are both fast and exact.
+
+While the results for basic implementations of these algorithms look like this, none should be dismissed as bad or uninteresting.
+Often, small tweaks can lead to dramatic changes for runtime and solution quality.
+
 
 \subsection{Limitations}
 This study compares a small selection of existing algorithms available to solve the TSP, there are other approaches that solve it in a different way, however this selection of algorithm should give the reader a good overview of concepts and techniques to handle the NP-hard nature of this problem.
